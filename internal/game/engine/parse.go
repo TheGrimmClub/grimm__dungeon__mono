@@ -31,9 +31,10 @@ var (
 )
 
 // fillers are little words that carry no meaning for the parser (English plus a
-// few German ones, since the world speaks German).
+// few German ones, since the world speaks German). Direction words are NOT
+// fillers — "up"/"down" must survive so "go up" works.
 var fillers = set(
-	"the", "a", "an", "at", "on", "to", "up", "into", "with", "my",
+	"the", "a", "an", "at", "on", "to", "into", "with", "my",
 	"den", "die", "das", "der", "ein", "eine", "einen", "auf", "an", "nach",
 )
 
@@ -108,6 +109,35 @@ func matchItem(w *world.World, candidates []string, query []string) string {
 		}
 	}
 	return ""
+}
+
+// matchDetail returns authored scenery flavour if the query names one of a
+// room's detail keywords (case-insensitive, substring-friendly).
+func matchDetail(r *world.Room, query []string) string {
+	if len(r.Details) == 0 {
+		return ""
+	}
+	q := strings.Join(query, " ")
+	for key, text := range r.Details {
+		k := strings.ToLower(key)
+		if strings.Contains(q, k) || strings.Contains(k, q) {
+			return text
+		}
+	}
+	return ""
+}
+
+// wordInDescription reports whether a meaningful query token (>=3 letters)
+// appears in the room's description text — the cue for a generic "nothing
+// special" reply rather than "no such thing".
+func wordInDescription(r *world.Room, query []string) bool {
+	desc := strings.ToLower(r.Description)
+	for _, tok := range query {
+		if len(tok) >= 3 && strings.Contains(desc, tok) {
+			return true
+		}
+	}
+	return false
 }
 
 // exitOrder is the stable order for listing a room's exits. Tokens are English

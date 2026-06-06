@@ -24,6 +24,9 @@ type Room struct {
 	Description string          `yaml:"description"`
 	Exits       map[string]Exit `yaml:"exits"`
 	Items       []string        `yaml:"items"`
+	// Details gives authored flavour for scenery words a player might inspect
+	// (keyword -> German description), e.g. "wendeltreppe" -> "…führt nach oben".
+	Details map[string]string `yaml:"details"`
 }
 
 // Item is a thing the player can examine and possibly carry, wear or use.

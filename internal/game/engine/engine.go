@@ -166,17 +166,20 @@ func (g *Game) look() string {
 	return out
 }
 
-// move resolves a direction from the words after a "go" verb.
+// move resolves a direction from the words after a "go" verb. It scans for the
+// first recognised direction, so "go up", "go to north" and "go the north" all
+// work.
 func (g *Game) move(rest []string) string {
+	for _, w := range rest {
+		if dir, ok := world.NormalizeDirection(w); ok {
+			return g.moveDir(dir)
+		}
+	}
 	words := filterFillers(rest)
 	if len(words) == 0 {
 		return i18n.T(i18n.KeyWhichDirection)
 	}
-	dir, ok := world.NormalizeDirection(words[0])
-	if !ok {
-		return i18n.T(i18n.KeyUnknownDir, words[0])
-	}
-	return g.moveDir(dir)
+	return i18n.T(i18n.KeyUnknownDir, words[0])
 }
 
 // moveDir walks through an exit if one exists.
@@ -210,21 +213,30 @@ func (g *Game) take(rest []string) string {
 	return i18n.T(i18n.KeyTaken, it.Name)
 }
 
-// inspect describes an item in the room or in the inventory (by number or name).
+// inspect describes an item in the room or inventory (by number or name). If no
+// item matches, it falls back to authored scenery details, then to a gentle
+// generic reply for any word that appears in the room text — so reading the
+// description is always rewarded.
 func (g *Game) inspect(rest []string) string {
 	query := filterFillers(rest)
 	if len(query) == 0 {
 		return i18n.T(i18n.KeyExamineWhat)
 	}
 	r := g.world.Room(g.player.Location)
-	id := pick(g.world, g.presentItems(r), query)
-	if id == "" {
-		id = pick(g.world, g.player.Inventory, query)
+
+	if id := pick(g.world, g.presentItems(r), query); id != "" {
+		return strings.TrimRight(g.world.Item(id).Description, "\n")
 	}
-	if id == "" {
-		return i18n.T(i18n.KeyDontSee)
+	if id := pick(g.world, g.player.Inventory, query); id != "" {
+		return strings.TrimRight(g.world.Item(id).Description, "\n")
 	}
-	return strings.TrimRight(g.world.Item(id).Description, "\n")
+	if d := matchDetail(r, query); d != "" {
+		return strings.TrimRight(d, "\n")
+	}
+	if wordInDescription(r, query) {
+		return i18n.T(i18n.KeyNothingSpecial)
+	}
+	return i18n.T(i18n.KeyDontSee)
 }
 
 // wear equips a wearable item; wearing a light source floods the dungeon with

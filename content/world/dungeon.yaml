@@ -19,6 +19,10 @@ exits:
   north: { to: halle }
 items:
   - helm
+details:
+  tor: "Das Steintor ist uralt, doch unter dem Moos pulsiert Technik. Märchen und Maschine, untrennbar verwoben."
+  worte: "Die Leuchtschrift über dem Bogen flackert: »Nur wer liest, wird gehen.« Eine Warnung? Ein Versprechen?"
+  licht: "Blaues Licht sickert durch die Ritzen im Fels, als pulsiere dahinter ein Herz aus Strom."
 
 ---
 kind: room
@@ -64,6 +68,10 @@ exits:
 items:
   - nanostaub
   - ritualbuch
+details:
+  wendeltreppe: "Eiserne Stufen winden sich nach oben (up) in Richtung Turm. Sieht stabil aus."
+  amboss: "Ein kalter Amboss aus schwarzem Metall. Auf ihm wurde Kleinstes geschmiedet — kleiner als ein Gedanke."
+  roboter: "Aus der Nähe erkennst du sie: winzige Maschinen, kaum größer als Staubkörner, die im Funkenwirbel tanzen."
 
 ---
 kind: room

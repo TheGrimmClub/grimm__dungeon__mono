@@ -44,6 +44,37 @@ func TestMovementAndBareDirection(t *testing.T) {
 	}
 }
 
+func TestGoUpFromWorkshop(t *testing.T) {
+	g := newGame(t)
+	g.Do("go north") // halle
+	g.Do("go north") // werkstatt
+	if got := g.Do("go up"); !strings.Contains(got, "Turm der wachen KI") {
+		t.Errorf("'go up' from the workshop did not reach the tower:\n%s", got)
+	}
+	if got := g.Do("go down"); !strings.Contains(got, "Werkstatt des Nanoschmieds") {
+		t.Errorf("'go down' did not return to the workshop:\n%s", got)
+	}
+}
+
+func TestInspectScenery(t *testing.T) {
+	g := newGame(t)
+	g.Do("go north")
+	g.Do("go north") // werkstatt, which has authored details
+
+	// Authored scenery detail.
+	if got := g.Do("inspect wendeltreppe"); !strings.Contains(got, "nach oben") {
+		t.Errorf("authored detail not returned for Wendeltreppe:\n%s", got)
+	}
+	// A described word without an authored detail -> generic.
+	if got := g.Do("inspect funken"); !strings.Contains(got, "nichts Besonderes") {
+		t.Errorf("generic reply expected for a described word:\n%s", got)
+	}
+	// A word that appears nowhere -> honest "no such thing".
+	if got := g.Do("inspect raumschiff"); !strings.Contains(got, "siehst du hier nicht") {
+		t.Errorf("absent word should give don't-see:\n%s", got)
+	}
+}
+
 func TestTakeByNameAndNumber(t *testing.T) {
 	g := newGame(t)
 	if got := g.Do("take helm"); !strings.Contains(got, "Du nimmst") {

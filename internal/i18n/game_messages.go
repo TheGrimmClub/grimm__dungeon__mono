@@ -16,6 +16,7 @@ const (
 	KeyInventoryHead  = "game.inventory_header"
 	KeyExamineWhat    = "game.examine_what"
 	KeyDontSee        = "game.dont_see"
+	KeyNothingSpecial = "game.nothing_special"
 	KeyUnknownVerb    = "game.unknown_verb"
 	KeyWearWhat       = "game.wear_what"
 	KeyWorn           = "game.worn"
@@ -87,6 +88,9 @@ func init() {
 	add(KeyDontSee,
 		"So etwas siehst du hier nicht.",
 		"You don't see such a thing here.")
+	add(KeyNothingSpecial,
+		"Du siehst genauer hin, findest aber nichts Besonderes.",
+		"You take a closer look, but find nothing special.")
 	add(KeyUnknownVerb,
 		"Das verstehe ich nicht. Versuche: look, go <Richtung>, take <Ding>, inspect <Ding>, wear <Ding>, inventory.",
 		"I don't understand. Try: look, go <direction>, take <thing>, inspect <thing>, wear <thing>, inventory.")
