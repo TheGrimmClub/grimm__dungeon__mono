@@ -1,17 +1,23 @@
 package app
 
 import (
+	"path/filepath"
 	"strings"
 	"testing"
 )
 
-// runScript feeds the given input lines through a fresh grimm session and
-// returns everything it printed.
+// runScript feeds the given input lines through a fresh grimm session with
+// persistence disabled (hermetic) and returns everything it printed.
 func runScript(t *testing.T, input string) string {
 	t.Helper()
+	return runScriptWith(t, input, Options{})
+}
+
+func runScriptWith(t *testing.T, input string, opts Options) string {
+	t.Helper()
 	var out strings.Builder
-	if err := Run(strings.NewReader(input), &out); err != nil {
-		t.Fatalf("Run returned error: %v", err)
+	if err := RunWith(strings.NewReader(input), &out, opts); err != nil {
+		t.Fatalf("RunWith returned error: %v", err)
 	}
 	return out.String()
 }
@@ -60,4 +66,40 @@ func TestUnknownCommand(t *testing.T) {
 func TestEOFEndsSessionCleanly(t *testing.T) {
 	// No /quit — input simply ends. Run must return without error.
 	_ = runScript(t, "import antigravity\n")
+}
+
+func TestIntroShowsStartRoomAndVerbHint(t *testing.T) {
+	out := runScript(t, "/quit\n")
+	if !strings.Contains(out, "Das verwunschene Tor") {
+		t.Errorf("intro did not describe the start room:\n%s", out)
+	}
+	if !strings.Contains(out, "Sprich mit dem Verlies") {
+		t.Errorf("intro did not show the verb hint:\n%s", out)
+	}
+}
+
+func TestFreeTextRoutesToEngine(t *testing.T) {
+	out := runScript(t, "gehe norden\n/quit\n")
+	if !strings.Contains(out, "Halle der schlafenden Maschinen") {
+		t.Errorf("free-text verb did not reach the engine:\n%s", out)
+	}
+}
+
+func TestSaveThenContinue(t *testing.T) {
+	opts := Options{SavePath: filepath.Join(t.TempDir(), "save.yaml")}
+
+	// First session: walk north, pick up the lamp, save.
+	first := runScriptWith(t, "gehe norden\n/save\n/quit\n", opts)
+	if !strings.Contains(first, "versiegelt") {
+		t.Fatalf("save did not confirm:\n%s", first)
+	}
+
+	// Second session with the same save path: should resume in the hall.
+	second := runScriptWith(t, "schau\n/quit\n", opts)
+	if !strings.Contains(second, "Du nimmst deinen Weg wieder auf") {
+		t.Errorf("second session did not report continuing:\n%s", second)
+	}
+	if !strings.Contains(second, "Halle der schlafenden Maschinen") {
+		t.Errorf("second session did not resume in the saved room:\n%s", second)
+	}
 }

@@ -1,0 +1,79 @@
+# Das Verlies der Brüder Grimm — Startkapitel.
+# Märchen trifft Hochtechnologie: Nanobots, Androiden, echte KI.
+# Mehrere YAML-Dokumente pro Datei, getrennt durch "---".
+
+kind: meta
+start: tor
+
+---
+kind: room
+id: tor
+title: Das verwunschene Tor
+description: |
+  Ein uraltes Steintor wölbt sich vor dir, von Moos überwuchert. Doch durch die
+  Ritzen pulsiert ein blaues Licht, als flösse Strom durch die Adern des Felsens.
+  Über dem Bogen stehen Worte, halb Gravur, halb Leuchtschrift:
+  »Nur wer liest, wird gehen.«
+  Nach Norden öffnet sich ein dunkler Gang.
+exits:
+  norden: { to: halle }
+items:
+  - taschenlampe
+
+---
+kind: room
+id: halle
+title: Die Halle der schlafenden Maschinen
+description: |
+  Ranken aus Glasfaser umschlingen reglose Androiden, die wie verzauberte
+  Gestalten an den Wänden lehnen. Einer von ihnen blinzelt im Takt eines
+  langsamen Herzschlags — schläft er, oder träumt er von Strom?
+  Gänge führen nach Süden zurück, nach Osten und weiter nach Norden.
+exits:
+  sueden: { to: tor }
+  osten: { to: bibliothek }
+  norden: { to: werkstatt }
+items:
+  - androide
+
+---
+kind: room
+id: bibliothek
+title: Die Bibliothek der Märchen-Algorithmen
+description: |
+  Regale bis zur Decke, voll mit Büchern, die leise summen. Manche Seiten sind
+  aus Pergament, andere aus Licht. Wer hier liest, hört zugleich das Rechnen
+  einer alten Maschine, die jede Geschichte zu Ende denkt.
+  Nach Westen geht es zurück in die Halle.
+exits:
+  westen: { to: halle }
+items:
+  - maerchenbuch
+
+---
+kind: room
+id: werkstatt
+title: Die Werkstatt des Nanoschmieds
+description: |
+  Funken aus Millionen winziger Roboter wirbeln über einem kalten Amboss. Hier
+  schmiedete einst ein Meister Dinge, die kleiner sind als ein Gedanke. Eine
+  Wendeltreppe führt hinauf, der Gang nach Süden zurück in die Halle.
+exits:
+  sueden: { to: halle }
+  oben: { to: turm }
+items:
+  - nanostaub
+
+---
+kind: room
+id: turm
+title: Der Turm der wachen KI
+description: |
+  Ganz oben, wo der Wind durch Serverschränke singt, wacht eine Intelligenz,
+  die niemals schläft. Tausend Lichter atmen im Gleichklang. In der Mitte des
+  Raums schwebt etwas Klares und Helles — und es scheint dich zu erwarten.
+  Nur die Treppe nach unten führt zurück.
+exits:
+  unten: { to: werkstatt }
+items:
+  - kristallkern

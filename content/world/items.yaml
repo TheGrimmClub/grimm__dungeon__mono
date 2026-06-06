@@ -1,0 +1,46 @@
+# Gegenstände des Startkapitels. Eigene Datei — der Lader liest alle *.yaml
+# in content/world und fügt sie zusammen.
+
+kind: item
+id: taschenlampe
+name: Taschenlampe
+description: |
+  Eine kleine Taschenlampe, deren Glühfaden wie ein gefangenes Glühwürmchen
+  flackert. Mit ihr fürchtest du kein Dunkel.
+takeable: true
+
+---
+kind: item
+id: androide
+name: schlafender Androide
+description: |
+  Aus der Nähe siehst du sein Gesicht: ruhig, fast menschlich. Auf seiner Brust
+  blinkt schwach ein Symbol — ein Apfel mit einem Bissen heraus. Wecke ihn nicht.
+takeable: false
+
+---
+kind: item
+id: maerchenbuch
+name: Märchenbuch
+description: |
+  Ein schwerer Band. Schlägst du ihn auf, ordnen sich die Buchstaben neu, als
+  läse die Maschine mit dir. Auf dem Vorsatz steht: »Lesen ist der erste Zauber.«
+takeable: true
+
+---
+kind: item
+id: nanostaub
+name: Fläschchen Nanostaub
+description: |
+  In dem Glas wirbeln Funken wie Sternenstaub. Jedes Körnchen ist eine winzige
+  Maschine, die baut, was du ihr in klaren Worten beschreibst.
+takeable: true
+
+---
+kind: item
+id: kristallkern
+name: Kristallkern
+description: |
+  Ein klarer Kristall, in dem Licht pulst wie ein Herzschlag. Er fühlt sich warm
+  an — als trüge er den ersten Funken einer echten Intelligenz in sich.
+takeable: true
