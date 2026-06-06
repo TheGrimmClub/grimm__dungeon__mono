@@ -1,0 +1,108 @@
+# TheGrimmClub — requirements (living source of truth)
+# Referenced and updated as the project evolves. IDs are stable; status may change.
+# priority: must | should | could    status: active | done | dropped
+meta:
+  project: TheGrimmClub — grimm interactive learning dungeon
+  audience: 9th graders (Kassel / north Hessen)
+  updated: 2026-06-06
+
+requirements:
+  - id: R001
+    title: Teach concepts, not a specific language
+    description: >
+      Focus on the ideas behind programming and software: code reading over writing,
+      understanding the human psyche and the computer's hardware/software, rather than
+      memorising the keywords of one language.
+    priority: must
+    status: active
+
+  - id: R002
+    title: Fast easy wins and a glimpse of power
+    description: >
+      Engage students in a fun, challenging way with quick early wins and a glimpse of
+      real power, so they stay curious and keep exploring on their own later.
+    priority: must
+    status: active
+
+  - id: R003
+    title: Command-line dungeon as the main entry point
+    description: >
+      The grimm executable is a CLI dungeon. Students move room to room solving puzzles.
+      Rooms can hold information or loot; some contain enemies to battle.
+    priority: must
+    status: active
+
+  - id: R004
+    title: Grimm-world high-tech-fairytale theme
+    description: >
+      A Brothers Grimm fairytale world (the Grimms are historical figures in Kassel)
+      mixed with high tech: nanobots, androids, real artificial intelligence.
+    priority: must
+    status: active
+
+  - id: R005
+    title: Three kinds of puzzle checks
+    description: >
+      Puzzles are validated by one of three check kinds — answer (riddle/knowledge),
+      artifact (proof of a real-world action, e.g. a reachable git repo URL), and
+      behavioral (solve in Python OR Go OR a CLI one-liner; validated by I/O, not language).
+    priority: must
+    status: active
+
+  - id: R006
+    title: Student work versioned via alchemist (git)
+    description: >
+      Student files live in their own git repository. The alchemist tool skins git with a
+      potion-brewing metaphor (brew/bottle/discard/clean/look). Version control becomes the
+      key that opens the next room (via artifact checks).
+    priority: must
+    status: active
+
+  - id: R007
+    title: Evolve from Zork-like REPL toward a Claude-Code-shaped shell
+    description: >
+      Start simple like Zork (text in/out), then grow into a tool with free-text input plus
+      /command input — including /terminal (run/simulate bash), /book (editor), /alchemist.
+    priority: must
+    status: active
+
+  - id: R008
+    title: Wow effects
+    description: >
+      At least one or two delight moments akin to Python's `import antigravity`: a hidden
+      easter egg, an upgrade from plain REPL to a Bubble Tea TUI, and a local HTTP character
+      sheet plus a communicator that students implement themselves and plug in.
+    priority: should
+    status: active
+
+  - id: R009
+    title: German narrative, English technical surface
+    description: >
+      Story, room text and riddles in German (immersive for local students); commands, code
+      and the terminal stay in English, matching real-world tooling.
+    priority: must
+    status: active
+
+  - id: R010
+    title: Local single-binary delivery with guided setup
+    description: >
+      Ship one downloadable grimm binary per OS (incl. possibly locked-down Windows).
+      Installing git/Python/Go is framed as the first in-game quest ("Quest 0").
+    priority: must
+    status: active
+
+  - id: R011
+    title: Content authored as embedded multi-document YAML
+    description: >
+      Rooms, puzzles, items, enemies and dialogue authored as multi-document YAML files,
+      embedded via embed.FS; the three check kinds implemented as named Go validators.
+    priority: must
+    status: active
+
+  - id: R012
+    title: Student-built communicator plug-in (later phase)
+    description: >
+      Students build their own communicator/chatbot CLI outside the game (language of their
+      choice) and register it with grimm via a simple contract. Their one real authoring moment.
+    priority: could
+    status: active

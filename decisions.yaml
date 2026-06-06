@@ -1,0 +1,94 @@
+# TheGrimmClub — decisions (living source of truth, ADR-style)
+# Referenced and updated as the project evolves. IDs are stable.
+# status: proposed | accepted | superseded
+meta:
+  updated: 2026-06-06
+
+decisions:
+  - id: D001
+    title: Narrative language
+    decision: German narrative/story/riddles; English for all commands, code and terminal.
+    status: accepted
+    date: 2026-06-06
+    rationale: Immersive for Kassel/Hessen students; technical surface stays authentic.
+    requirements: [R009]
+
+  - id: D002
+    title: Runtime and delivery
+    decision: One downloadable grimm binary per OS; installing git/Python/Go is "Quest 0".
+    status: accepted
+    date: 2026-06-06
+    rationale: Simplest distribution; environment setup itself becomes a first lesson.
+    requirements: [R010]
+
+  - id: D003
+    title: Puzzle check model
+    decision: Three kinds — answer, artifact, behavioral (language-agnostic via I/O).
+    status: accepted
+    date: 2026-06-06
+    rationale: A Puzzle = prompt + acceptance check; the validator is the core abstraction.
+    requirements: [R005]
+
+  - id: D004
+    title: Content authoring format
+    decision: Multi-document YAML embedded via embed.FS; checks as named Go validators.
+    status: accepted
+    date: 2026-06-06
+    rationale: Fast to author, type-safe-ish, logic stays in Go.
+    requirements: [R011]
+
+  - id: D005
+    title: Student file storage
+    decision: Student work lives in their own git repo, driven by alchemist potion verbs.
+    status: accepted
+    date: 2026-06-06
+    rationale: Versioning is the proof-of-work that artifact checks validate to open doors.
+    requirements: [R006]
+
+  - id: D006
+    title: alchemist placement
+    decision: Shared library (internal/alchemist) exposed as both cmd/alchemist and /alchemist.
+    status: accepted
+    date: 2026-06-06
+    rationale: One codebase, both the standalone "real tool" and the in-game surface.
+    requirements: [R006, R007]
+
+  - id: D007
+    title: Module path
+    decision: github.com/TheGrimmClub/grimm__dungeon__mono (matches the git remote/org).
+    status: accepted
+    date: 2026-06-06
+    rationale: Resolved from the existing origin remote.
+
+  - id: D008
+    title: Git workflow — commit then branch before every change
+    decision: >
+      Before starting any change/phase, commit the open files (clean checkpoint), then
+      create a new branch for the upcoming work. Each change lands on its own branch.
+    status: accepted
+    date: 2026-06-06
+    rationale: Keeps history reviewable and revertible.
+
+  # --- Open / deferred (recorded as proposed; confirm before implementing) ---
+  - id: D009
+    title: /terminal model
+    decision: Real OS shell scoped to the student's repo workdir (vs a simulated mini-shell).
+    status: proposed
+    date: 2026-06-06
+    rationale: Real git/Python/Go are needed anyway; keeps the "real power" feel. Phase 4.
+    requirements: [R007]
+
+  - id: D010
+    title: Communicator contract
+    decision: TBD — stdin/stdout vs HTTP for the student-built communicator plug-in.
+    status: proposed
+    date: 2026-06-06
+    rationale: Deferred to Phase 6.
+    requirements: [R012]
+
+  - id: D011
+    title: Game-save location
+    decision: TBD — local save file (e.g. ~/.grimm/save.yaml) vs inside the student repo.
+    status: proposed
+    date: 2026-06-06
+    rationale: Keep game progress separate from student work artifacts.
