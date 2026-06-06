@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	if err := app.Run(os.Stdin, os.Stdout); err != nil {
+	if err := app.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "grimm:", err)
 		os.Exit(1)
 	}

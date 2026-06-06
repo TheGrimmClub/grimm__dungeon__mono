@@ -14,7 +14,7 @@ id: tor
 title: Das Tor
 description: Ein rostiges Tor.
 exits:
-  norden: { to: halle }
+  north: { to: halle }
 items: [schluessel]
 ---
 kind: room
@@ -22,7 +22,7 @@ id: halle
 title: Die Halle
 description: Eine weite Halle.
 exits:
-  sueden: { to: tor }
+  south: { to: tor }
 ---
 kind: item
 id: schluessel
@@ -54,7 +54,7 @@ func TestLoadBuildsGraph(t *testing.T) {
 	if tor == nil || tor.Title != "Das Tor" {
 		t.Fatalf("room tor not loaded correctly: %+v", tor)
 	}
-	if ex, ok := tor.Exits["norden"]; !ok || ex.To != "halle" {
+	if ex, ok := tor.Exits["north"]; !ok || ex.To != "halle" {
 		t.Errorf("tor north exit = %+v, want -> halle", ex)
 	}
 	if it := w.Item("schluessel"); it == nil || !it.Takeable {
@@ -72,7 +72,7 @@ id: a
 title: A
 description: A
 exits:
-  norden: { to: nirgendwo }
+  north: { to: nirgendwo }
 `
 	fsys := fstest.MapFS{"world/x.yaml": {Data: []byte(doc)}}
 	if _, err := Load(fsys, "world/*.yaml"); err == nil {
@@ -95,17 +95,17 @@ description: A
 
 func TestNormalizeDirection(t *testing.T) {
 	cases := map[string]string{
-		"norden": "norden", "n": "norden",
-		"süden": "sueden", "s": "sueden",
-		"o": "osten", "west": "westen",
-		"hoch": "oben", "runter": "unten",
+		"north": "north", "n": "north", "norden": "north", // German alias accepted
+		"south": "south", "s": "south",
+		"e": "east", "west": "west",
+		"up": "up", "down": "down", "hoch": "up", "runter": "down",
 	}
 	for in, want := range cases {
 		if got, ok := NormalizeDirection(in); !ok || got != want {
 			t.Errorf("NormalizeDirection(%q) = %q,%v want %q", in, got, ok, want)
 		}
 	}
-	if _, ok := NormalizeDirection("seitwärts"); ok {
-		t.Error("NormalizeDirection(seitwärts) = ok, want !ok")
+	if _, ok := NormalizeDirection("sideways"); ok {
+		t.Error("NormalizeDirection(sideways) = ok, want !ok")
 	}
 }

@@ -7,7 +7,10 @@ meta:
 decisions:
   - id: D001
     title: Narrative language
-    decision: German narrative/story/riddles; English for all commands, code and terminal.
+    decision: >
+      German narrative/story/riddles; English for the whole command surface — slash
+      commands AND game verbs/directions (look, go north, inspect, wear). Rule of thumb:
+      you TYPE English, the world ANSWERS in German.
     status: accepted
     date: 2026-06-06
     rationale: Immersive for Kassel/Hessen students; technical surface stays authentic.
@@ -68,6 +71,38 @@ decisions:
     status: accepted
     date: 2026-06-06
     rationale: Keeps history reviewable and revertible.
+
+  - id: D013
+    title: Bubble Tea UI pulled forward to now
+    decision: >
+      Adopt Bubble Tea (+ bubbles, lipgloss) as the input/render layer immediately,
+      ahead of its original Phase 5 slot. The engine stays a pure string-in/string-out
+      core; a UI-independent `session` package owns dispatch; `tui` is a thin view.
+      Enables arrow-key history and the headlamp colour "aha" (wearing the Helm lights
+      the dungeon in colour) now.
+    status: accepted
+    date: 2026-06-06
+    rationale: Player-requested; faster wins and the first colour aha. Phase 5 becomes polish.
+    requirements: [R008]
+
+  - id: D014
+    title: Numbered item selection + inventory hotbar
+    decision: >
+      Room items are listed as [1..n]; the inventory is a 10-slot hotbar [1..0]. Verbs
+      accept a number or a name (take 1 / take helm). Numbers resolve against room items
+      first, then the inventory.
+    status: accepted
+    date: 2026-06-06
+    rationale: Fast selection; teaches indexing implicitly.
+
+  - id: D015
+    title: Player addressed as "Human" until a class is chosen
+    decision: >
+      New players are addressed as "Human" (prompt "Human> "). Later they pick a class
+      (Alchemist, Hunter, …) which changes the title.
+    status: accepted
+    date: 2026-06-06
+    rationale: Cooler and class-neutral at the start; sets up a future class system.
 
   # --- Open / deferred (recorded as proposed; confirm before implementing) ---
   - id: D009

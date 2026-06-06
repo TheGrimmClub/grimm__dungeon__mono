@@ -39,8 +39,10 @@ the old Python words to the dungeon for a surprise.
 | Path | What |
 |------|------|
 | `cmd/grimm`, `cmd/alchemist` | thin binary entry points |
-| `internal/app`, `internal/repl`, `internal/command` | the shell loop |
-| `internal/i18n` | German narrative text (tech surface stays English) |
+| `internal/tui` | Bubble Tea UI: scrollback, history, headlamp colour |
+| `internal/session`, `internal/command` | pure dispatch (`/commands` + game verbs) |
+| `internal/game/{world,entity,engine,state}` | the dungeon + verb engine |
+| `internal/i18n` | German narrative text (commands/verbs stay English) |
 | `internal/alchemist` | git-as-potion-brewing library (real wiring: Phase 3) |
 | `content/` | multi-document YAML rooms/puzzles (Phase 1+) |
 | `requirements.yaml`, `decisions.yaml` | living source of truth |

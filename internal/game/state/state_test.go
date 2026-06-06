@@ -14,8 +14,10 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "nested", "save.yaml")
 
 	want := engine.Snapshot{
+		Title:     "Human",
 		Location:  "halle",
-		Inventory: []string{"taschenlampe", "maerchenbuch"},
+		Inventory: []string{"helm", "maerchenbuch"},
+		Worn:      []string{"helm"},
 		Visited:   []string{"tor", "halle"},
 	}
 	if err := Save(path, want); err != nil {

@@ -1,40 +1,40 @@
 package engine
 
 import (
+	"strconv"
 	"strings"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/world"
 )
 
-// German verb vocabularies. Kept generous so students can phrase things a few
-// natural ways without a parser fighting them.
+// English verb vocabularies (commands are English by decision D001). Kept
+// generous so students can phrase things a few natural ways.
 var (
 	verbLook = set(
-		"schau", "schaue", "schauen", "umschau", "umschauen", "umsehen",
-		"umsieh", "sieh", "blick", "blicke", "blicken",
+		"look", "l", "around",
 	)
 	verbGo = set(
-		"gehe", "geh", "gehen", "lauf", "laufe", "laufen", "wandere", "betritt",
+		"go", "move", "walk", "enter", "head",
 	)
 	verbTake = set(
-		"nimm", "nimm!", "nehmen", "nehme", "heb", "hebe", "aufheben",
-		"schnapp", "schnappe", "greif", "greife",
+		"take", "get", "grab", "pick", "pickup",
 	)
-	verbExamine = set(
-		"untersuche", "untersuchen", "betrachte", "betrachten", "pruefe",
-		"prüfe", "prüfen", "pruefen", "inspiziere", "lies", "lesen", "öffne",
-		"oeffne",
+	verbInspect = set(
+		"inspect", "examine", "x", "read", "study", "check",
+	)
+	verbWear = set(
+		"wear", "equip", "don", "put",
 	)
 	verbInventory = set(
-		"inventar", "inventur", "inv", "tasche", "taschen", "beutel", "i",
+		"inventory", "inv", "i", "items", "bag",
 	)
 )
 
-// fillers are little German words that carry no meaning for the parser.
+// fillers are little words that carry no meaning for the parser (English plus a
+// few German ones, since the world speaks German).
 var fillers = set(
-	"nach", "zum", "zur", "in", "im", "ins", "auf", "an", "den", "die", "das",
-	"der", "ein", "eine", "einen", "einem", "mir", "mich", "dem", "richtung",
-	"das", "mal", "bitte", "und",
+	"the", "a", "an", "at", "on", "to", "up", "into", "with", "my",
+	"den", "die", "das", "der", "ein", "eine", "einen", "auf", "an", "nach",
 )
 
 func set(words ...string) map[string]bool {
@@ -45,7 +45,9 @@ func set(words ...string) map[string]bool {
 	return m
 }
 
-// filterFillers drops filler words, leaving the meaningful tokens.
+// filterFillers drops filler words, leaving the meaningful tokens. Note: "up"
+// is a filler for phrases like "pick up", but a bare direction "up" is handled
+// before fillers are stripped (see Do/move).
 func filterFillers(words []string) []string {
 	out := make([]string, 0, len(words))
 	for _, w := range words {
@@ -56,9 +58,34 @@ func filterFillers(words []string) []string {
 	return out
 }
 
+// singleInt reports whether the query is a single integer token, and its value.
+func singleInt(query []string) (int, bool) {
+	if len(query) != 1 {
+		return 0, false
+	}
+	n, err := strconv.Atoi(query[0])
+	if err != nil {
+		return 0, false
+	}
+	return n, true
+}
+
+// pick resolves a query against an ordered list of item ids: a single integer
+// selects by 1-based position; otherwise it falls back to a forgiving name
+// match. Returns "" if nothing matches.
+func pick(w *world.World, list []string, query []string) string {
+	if n, ok := singleInt(query); ok {
+		if n >= 1 && n <= len(list) {
+			return list[n-1]
+		}
+		return ""
+	}
+	return matchItem(w, list, query)
+}
+
 // matchItem finds, among the candidate item ids, the one the query refers to.
 // It matches on the item id (exact token) or a forgiving name overlap, so
-// "nimm lampe" finds the "Taschenlampe". Returns "" if nothing matches.
+// "wear helm" finds the "Helm mit Stirnlampe". Returns "" if nothing matches.
 func matchItem(w *world.World, candidates []string, query []string) string {
 	if len(query) == 0 {
 		return ""
@@ -71,8 +98,7 @@ func matchItem(w *world.World, candidates []string, query []string) string {
 			continue
 		}
 		name := strings.ToLower(it.Name)
-		switch {
-		case strings.Contains(name, q), strings.Contains(q, name):
+		if strings.Contains(name, q) || strings.Contains(q, name) {
 			return id
 		}
 		for _, tok := range query {
@@ -84,38 +110,24 @@ func matchItem(w *world.World, candidates []string, query []string) string {
 	return ""
 }
 
-// exitDisplay is the stable order and labels for listing a room's exits.
-var exitDisplay = []struct{ key, label string }{
-	{"norden", "Norden"},
-	{"osten", "Osten"},
-	{"sueden", "Süden"},
-	{"westen", "Westen"},
-	{"oben", "oben"},
-	{"unten", "unten"},
-}
+// exitOrder is the stable order for listing a room's exits. Tokens are English
+// (what the player types).
+var exitOrder = []string{"north", "east", "south", "west", "up", "down"}
 
-// exitList renders a room's exits in a stable, readable order.
-func (g *Game) exitList(r *world.Room) string {
-	labels := make([]string, 0, len(r.Exits))
-	for _, d := range exitDisplay {
-		if _, ok := r.Exits[d.key]; ok {
-			labels = append(labels, d.label)
+// exitList renders a room's exits in a stable order, styling them when lit.
+func (g *Game) exitList(r *world.Room, lit bool) string {
+	tokens := make([]string, 0, len(r.Exits))
+	for _, dir := range exitOrder {
+		if _, ok := r.Exits[dir]; ok {
+			if lit {
+				tokens = append(tokens, g.palette.Exit.Render(dir))
+			} else {
+				tokens = append(tokens, dir)
+			}
 		}
 	}
-	if len(labels) == 0 {
+	if len(tokens) == 0 {
 		return "—"
 	}
-	return joinList(labels)
-}
-
-// joinList joins names as "a, b und c" (German list style).
-func joinList(items []string) string {
-	switch len(items) {
-	case 0:
-		return ""
-	case 1:
-		return items[0]
-	default:
-		return strings.Join(items[:len(items)-1], ", ") + " und " + items[len(items)-1]
-	}
+	return strings.Join(tokens, ", ")
 }

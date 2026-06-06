@@ -46,12 +46,12 @@ var catalog = map[string]map[Lang]string{
 		EN: "TheGrimmClub's tutor — a dungeon of code and fairy tales",
 	},
 	KeyWelcome: {
-		DE: "Willkommen, Lehrling. Vor dir liegt das Verlies der Brüder Grimm,\n" +
+		DE: "Willkommen, Human. Vor dir liegt das Verlies der Brüder Grimm,\n" +
 			"verwoben mit Nanobots, Androiden und echter künstlicher Intelligenz.\n" +
-			"Tippe %s, um die Schriftrolle der Befehle zu sehen, oder %s zum Gehen.",
-		EN: "Welcome, apprentice. Before you lies the dungeon of the Brothers Grimm,\n" +
+			"Tippe %s für die Schriftrolle der Befehle, oder %s zum Gehen.",
+		EN: "Welcome, Human. Before you lies the dungeon of the Brothers Grimm,\n" +
 			"woven with nanobots, androids and real artificial intelligence.\n" +
-			"Type %s to see the scroll of commands, or %s to leave.",
+			"Type %s for the scroll of commands, or %s to leave.",
 	},
 	KeyPrompt: {
 		DE: "grimm> ",
@@ -74,8 +74,8 @@ var catalog = map[string]map[Lang]string{
 		EN: "The dungeon hears your whisper \"%s\", but does not yet answer.",
 	},
 	KeyGoodbye: {
-		DE: "Die Fackeln verlöschen. Bis bald, Lehrling.",
-		EN: "The torches go dark. Until next time, apprentice.",
+		DE: "Die Fackeln verlöschen. Bis bald, Human.",
+		EN: "The torches go dark. Until next time, Human.",
 	},
 	KeyEasterEgg: {
 		DE: "Du sprichst die alten Worte — und plötzlich trägt dich nichts mehr.\n" +

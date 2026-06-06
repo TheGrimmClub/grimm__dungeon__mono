@@ -2,12 +2,15 @@
 # in content/world und fügt sie zusammen.
 
 kind: item
-id: taschenlampe
-name: Taschenlampe
+id: helm
+name: Helm mit Stirnlampe
 description: |
-  Eine kleine Taschenlampe, deren Glühfaden wie ein gefangenes Glühwürmchen
-  flackert. Mit ihr fürchtest du kein Dunkel.
+  Ein robuster Helm, an dessen Stirn eine kleine Lampe sitzt. Ihr Glühfaden
+  flackert wie ein gefangenes Glühwürmchen. Setz ihn auf (»wear helm«), und das
+  Dunkel des Verlieses weicht — plötzlich siehst du die Welt in Farbe.
 takeable: true
+wearable: true
+light: true
 
 ---
 kind: item

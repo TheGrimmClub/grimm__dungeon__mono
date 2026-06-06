@@ -20,80 +20,114 @@ func newGame(t *testing.T) *Game {
 func TestIntroDescribesStartRoom(t *testing.T) {
 	g := newGame(t)
 	intro := g.Intro()
-	if !strings.Contains(intro, "Das verwunschene Tor") {
-		t.Errorf("intro missing start room title:\n%s", intro)
-	}
-	if !strings.Contains(intro, "Ausgänge: Norden") {
-		t.Errorf("intro missing exits line:\n%s", intro)
-	}
-	if !strings.Contains(intro, "Taschenlampe") {
-		t.Errorf("intro should mention the loot in the room:\n%s", intro)
+	for _, want := range []string{
+		"Das verwunschene Tor",    // room title
+		"Ausgänge: north",         // exits use English tokens
+		"[1] Helm mit Stirnlampe", // numbered item
+	} {
+		if !strings.Contains(intro, want) {
+			t.Errorf("intro missing %q:\n%s", want, intro)
+		}
 	}
 }
 
 func TestMovementAndBareDirection(t *testing.T) {
 	g := newGame(t)
-	// "gehe norden" -> the hall.
-	if got := g.Do("gehe norden"); !strings.Contains(got, "Halle der schlafenden Maschinen") {
-		t.Errorf("gehe norden did not reach the hall:\n%s", got)
+	if got := g.Do("go north"); !strings.Contains(got, "Halle der schlafenden Maschinen") {
+		t.Errorf("go north did not reach the hall:\n%s", got)
 	}
-	// Bare direction "sueden" -> back to the gate.
-	if got := g.Do("sueden"); !strings.Contains(got, "Das verwunschene Tor") {
-		t.Errorf("bare 'sueden' did not return to the gate:\n%s", got)
+	if got := g.Do("south"); !strings.Contains(got, "Das verwunschene Tor") {
+		t.Errorf("bare 'south' did not return to the gate:\n%s", got)
 	}
-	// No exit east from the gate.
-	if got := g.Do("gehe osten"); !strings.Contains(got, "kein Weg") {
-		t.Errorf("expected 'no path' going east from gate, got:\n%s", got)
+	if got := g.Do("go east"); !strings.Contains(got, "kein Weg") {
+		t.Errorf("expected 'no path' east from gate:\n%s", got)
 	}
 }
 
-func TestTakeAndInventory(t *testing.T) {
+func TestTakeByNameAndNumber(t *testing.T) {
 	g := newGame(t)
-	if got := g.Do("nimm lampe"); !strings.Contains(got, "Du nimmst") {
-		t.Errorf("could not take the lamp by partial name:\n%s", got)
+	if got := g.Do("take helm"); !strings.Contains(got, "Du nimmst") {
+		t.Errorf("take by name failed:\n%s", got)
 	}
-	if got := g.Do("inventar"); !strings.Contains(got, "Taschenlampe") {
-		t.Errorf("lamp not in inventory:\n%s", got)
+	if got := g.Do("inventory"); !strings.Contains(got, "Helm mit Stirnlampe") {
+		t.Errorf("helm not in inventory:\n%s", got)
 	}
-	// Once taken, the room no longer lists it.
-	if got := g.Do("schau"); strings.Contains(got, "Hier liegt: Taschenlampe") {
-		t.Errorf("room still advertises the taken lamp:\n%s", got)
+	// Once carried, the room no longer lists it.
+	if got := g.Do("look"); strings.Contains(got, "Helm mit Stirnlampe") {
+		t.Errorf("room still lists the taken helm:\n%s", got)
+	}
+
+	// Number selection on a fresh game.
+	g2 := newGame(t)
+	if got := g2.Do("take 1"); !strings.Contains(got, "Du nimmst") {
+		t.Errorf("take by number failed:\n%s", got)
 	}
 }
 
-func TestCannotTakeScenery(t *testing.T) {
+func TestWearHeadlampLightsUp(t *testing.T) {
 	g := newGame(t)
-	g.Do("gehe norden") // hall, contains the non-takeable androide
-	if got := g.Do("nimm androide"); !strings.Contains(got, "lässt sich nicht nehmen") {
-		t.Errorf("expected scenery to be untakeable, got:\n%s", got)
+	if g.Lit() {
+		t.Fatal("dungeon should start dark")
+	}
+	// `wear 1` auto-takes the helm from the room and lights up.
+	got := g.Do("wear 1")
+	if !strings.Contains(got, "Farbe") {
+		t.Errorf("wearing the headlamp did not announce the light:\n%s", got)
+	}
+	if !g.Lit() {
+		t.Error("Lit() should be true after wearing the headlamp")
+	}
+	// Re-wearing reports it is already worn.
+	if got := g.Do("wear helm"); !strings.Contains(got, "bereits") {
+		t.Errorf("expected already-worn message:\n%s", got)
 	}
 }
 
-func TestExamineRoomAndInventoryItems(t *testing.T) {
+func TestCannotWearScenery(t *testing.T) {
 	g := newGame(t)
-	if got := g.Do("untersuche lampe"); !strings.Contains(got, "Glühwürmchen") {
-		t.Errorf("examine of room item failed:\n%s", got)
+	g.Do("go north") // hall with the non-wearable androide
+	if got := g.Do("wear androide"); !strings.Contains(got, "nicht anlegen") {
+		t.Errorf("expected androide to be unwearable:\n%s", got)
 	}
-	g.Do("nimm lampe")
-	if got := g.Do("untersuche lampe"); !strings.Contains(got, "Glühwürmchen") {
-		t.Errorf("examine of carried item failed:\n%s", got)
+}
+
+func TestInspectRoomAndInventory(t *testing.T) {
+	g := newGame(t)
+	if got := g.Do("inspect 1"); !strings.Contains(got, "Glühfaden") {
+		t.Errorf("inspect room item by number failed:\n%s", got)
 	}
-	if got := g.Do("untersuche drache"); !strings.Contains(got, "siehst du hier nicht") {
-		t.Errorf("examine of absent item should fail gracefully:\n%s", got)
+	g.Do("take helm")
+	if got := g.Do("inspect helm"); !strings.Contains(got, "Glühfaden") {
+		t.Errorf("inspect carried item by name failed:\n%s", got)
+	}
+	if got := g.Do("inspect dragon"); !strings.Contains(got, "siehst du hier nicht") {
+		t.Errorf("inspect of absent item should fail gracefully:\n%s", got)
+	}
+}
+
+func TestInventoryHotbar(t *testing.T) {
+	g := newGame(t)
+	g.Do("wear 1") // take + wear the helm
+	got := g.Do("inventory")
+	if !strings.Contains(got, "[1]") || !strings.Contains(got, "Helm mit Stirnlampe") {
+		t.Errorf("hotbar missing slot/name:\n%s", got)
+	}
+	if !strings.Contains(got, "(angelegt)") {
+		t.Errorf("worn item not tagged in hotbar:\n%s", got)
 	}
 }
 
 func TestUnknownVerb(t *testing.T) {
 	g := newGame(t)
-	if got := g.Do("tanze"); !strings.Contains(got, "verstehe ich nicht") {
+	if got := g.Do("dance"); !strings.Contains(got, "verstehe ich nicht") {
 		t.Errorf("unknown verb not handled:\n%s", got)
 	}
 }
 
 func TestSnapshotRoundTrip(t *testing.T) {
 	g := newGame(t)
-	g.Do("nimm lampe")
-	g.Do("gehe norden")
+	g.Do("wear 1") // take + wear helm
+	g.Do("go north")
 	snap := g.Snapshot()
 
 	g2 := newGame(t)
@@ -101,10 +135,13 @@ func TestSnapshotRoundTrip(t *testing.T) {
 	if g2.player.Location != "halle" {
 		t.Errorf("restored location = %q, want halle", g2.player.Location)
 	}
-	if !g2.player.Has("taschenlampe") {
-		t.Error("restored player should carry the lamp")
+	if !g2.player.Has("helm") || !g2.player.Wears("helm") {
+		t.Error("restored player should carry and wear the helm")
 	}
-	if !g2.player.Visited["tor"] || !g2.player.Visited["halle"] {
-		t.Error("restored visited set incomplete")
+	if !g2.Lit() {
+		t.Error("restored game should still be lit")
+	}
+	if g2.player.Title != "Human" {
+		t.Errorf("restored title = %q, want Human", g2.player.Title)
 	}
 }

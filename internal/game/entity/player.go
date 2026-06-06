@@ -3,19 +3,43 @@
 // authored dungeon.
 package entity
 
+// DefaultTitle is how grimm addresses a player who has not yet chosen a class.
+const DefaultTitle = "Human"
+
 // Player is the dynamic state of the person playing.
 type Player struct {
+	Title     string          // how the world addresses them (Human, later Alchemist…)
 	Location  string          // current room id
 	Inventory []string        // item ids carried
+	Worn      []string        // item ids currently worn
 	Visited   map[string]bool // room ids already seen
 }
 
-// NewPlayer starts a player in the given room.
+// NewPlayer starts a player in the given room, as a class-less "Human".
 func NewPlayer(start string) *Player {
 	return &Player{
+		Title:     DefaultTitle,
 		Location:  start,
 		Inventory: []string{},
+		Worn:      []string{},
 		Visited:   map[string]bool{start: true},
+	}
+}
+
+// Wears reports whether the player is wearing the item.
+func (p *Player) Wears(id string) bool {
+	for _, it := range p.Worn {
+		if it == id {
+			return true
+		}
+	}
+	return false
+}
+
+// Wear marks an item as worn (no-op if already worn).
+func (p *Player) Wear(id string) {
+	if !p.Wears(id) {
+		p.Worn = append(p.Worn, id)
 	}
 }
 
