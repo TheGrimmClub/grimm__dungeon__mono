@@ -19,6 +19,7 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 		Inventory: []string{"helm", "maerchenbuch"},
 		Worn:      []string{"helm"},
 		Visited:   []string{"tor", "halle"},
+		Solved:    []string{"turm-raetsel"},
 	}
 	if err := Save(path, want); err != nil {
 		t.Fatalf("Save: %v", err)

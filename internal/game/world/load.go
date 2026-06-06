@@ -7,6 +7,8 @@ import (
 	"io/fs"
 
 	"gopkg.in/yaml.v3"
+
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/puzzle"
 )
 
 // Load reads every file matching glob from fsys, parses each as a stream of
@@ -24,7 +26,11 @@ func Load(fsys fs.FS, glob string) (*World, error) {
 		return nil, fmt.Errorf("world: no content files match %q", glob)
 	}
 
-	w := &World{Rooms: make(map[string]*Room), Items: make(map[string]*Item)}
+	w := &World{
+		Rooms:   make(map[string]*Room),
+		Items:   make(map[string]*Item),
+		Puzzles: make(map[string]*Puzzle),
+	}
 	for _, name := range files {
 		if err := loadFile(fsys, name, w); err != nil {
 			return nil, err
@@ -90,6 +96,15 @@ func routeDoc(node *yaml.Node, name string, w *World) error {
 			return fmt.Errorf("world: %s: item is missing an id", name)
 		}
 		w.Items[it.ID] = &it
+	case "puzzle":
+		var p Puzzle
+		if err := node.Decode(&p); err != nil {
+			return fmt.Errorf("world: %s: puzzle: %w", name, err)
+		}
+		if p.ID == "" {
+			return fmt.Errorf("world: %s: puzzle is missing an id", name)
+		}
+		w.Puzzles[p.ID] = &p
 	case "meta":
 		w.Start = head.Start
 	default:
@@ -112,11 +127,20 @@ func (w *World) validate() error {
 			if w.Rooms[ex.To] == nil {
 				return fmt.Errorf("world: room %q exit %q points at unknown room %q", id, dir, ex.To)
 			}
+			if ex.Puzzle != "" && w.Puzzles[ex.Puzzle] == nil {
+				return fmt.Errorf("world: room %q exit %q references unknown puzzle %q", id, dir, ex.Puzzle)
+			}
 		}
 		for _, itemID := range r.Items {
 			if w.Items[itemID] == nil {
 				return fmt.Errorf("world: room %q references unknown item %q", id, itemID)
 			}
+		}
+	}
+	// Every puzzle's check spec must build, so authoring errors fail at load.
+	for id, p := range w.Puzzles {
+		if _, err := puzzle.Build(p.Check); err != nil {
+			return fmt.Errorf("world: puzzle %q: %w", id, err)
 		}
 	}
 	return nil

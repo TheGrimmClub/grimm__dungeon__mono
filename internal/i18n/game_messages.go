@@ -24,12 +24,30 @@ const (
 	KeyAlreadyWorn    = "game.already_worn"
 	KeyWornTag        = "game.worn_tag"
 	KeyHeadlampOn     = "game.headlamp_on"
-	KeySaved          = "game.saved"
-	KeySaveFailed     = "game.save_failed"
-	KeySaveDisabled   = "game.save_disabled"
-	KeyContinued      = "game.continued"
-	KeyVerbHint       = "game.verb_hint"
-	KeyEmptyInfo      = "game.empty_info"
+
+	// Puzzles
+	KeySolveHint      = "game.solve_hint"
+	KeyNoActivePuzzle = "game.no_active_puzzle"
+	KeySolveWhat      = "game.solve_what"
+	KeyPuzzleSolved   = "game.puzzle_solved"
+	KeyPuzzleWrong    = "game.puzzle_wrong"
+	KeyPuzzleBroken   = "game.puzzle_broken"
+	KeyHintLabel      = "game.hint_label"
+	KeyLockedFootnote = "game.locked_footnote"
+	KeyVSolve         = "verb.solve"
+
+	// Class selection
+	KeyCmdClass     = "cmd.class"
+	KeyClassHeader  = "class.header"
+	KeyClassChoose  = "class.choose"
+	KeyClassChosen  = "class.chosen"
+	KeyClassUnknown = "class.unknown"
+	KeySaved        = "game.saved"
+	KeySaveFailed   = "game.save_failed"
+	KeySaveDisabled = "game.save_disabled"
+	KeyContinued    = "game.continued"
+	KeyVerbHint     = "game.verb_hint"
+	KeyEmptyInfo    = "game.empty_info"
 
 	// Help: section headers and one-line descriptions of the game verbs.
 	KeyHelpCmdHeader  = "help.cmd_header"
@@ -114,6 +132,48 @@ func init() {
 			"Dunkel weicht: zum ersten Mal siehst du das Verlies in Farbe.",
 		"You put on the helmet and click the headlamp. The dark recoils — for the "+
 			"first time you see the dungeon in colour.")
+
+	add(KeySolveHint,
+		"(Antworte mit »solve <deine Lösung>«.)",
+		"(Answer with \"solve <your solution>\".)")
+	add(KeyNoActivePuzzle,
+		"Hier gibt es gerade nichts zu lösen.",
+		"There is nothing to solve right now.")
+	add(KeySolveWhat,
+		"Womit möchtest du es versuchen?",
+		"What do you want to try?")
+	add(KeyPuzzleSolved,
+		"Richtig! Mit leisem Knirschen gibt der Weg nach.",
+		"Correct! With a soft grind, the way gives.")
+	add(KeyPuzzleWrong,
+		"Das war nicht die Lösung.",
+		"That was not the solution.")
+	add(KeyPuzzleBroken,
+		"Dieses Rätsel ist zerbrochen — sag dem Spielleiter Bescheid.",
+		"This puzzle is broken — tell the game master.")
+	add(KeyHintLabel,
+		"Tipp:",
+		"Hint:")
+	add(KeyLockedFootnote,
+		"* ein Rätsel versperrt diesen Weg — versuche dort zu »go« und dann »solve«.",
+		"* a puzzle seals this way — try to \"go\" there, then \"solve\".")
+	add(KeyVSolve, "ein Rätsel lösen (solve <Lösung>)", "solve a puzzle (solve <solution>)")
+
+	add(KeyCmdClass,
+		"wähle deinen Pfad (Klasse)",
+		"choose your path (class)")
+	add(KeyClassHeader,
+		"Noch bist du nur »Human«. Welchen Pfad wählst du?",
+		"For now you are only \"Human\". Which path do you choose?")
+	add(KeyClassChoose,
+		"Wähle mit »/class <name>«, z. B. »/class alchemist«.",
+		"Choose with \"/class <name>\", e.g. \"/class alchemist\".")
+	add(KeyClassChosen,
+		"Von nun an bist du %s. Dein Pfad hat begonnen.",
+		"From now on you are a %s. Your path has begun.")
+	add(KeyClassUnknown,
+		"»%s« ist kein Pfad, den ich kenne. Tippe »/class« für die Liste.",
+		"\"%s\" is not a path I know. Type \"/class\" for the list.")
 	add(KeySaved,
 		"Dein Fortschritt ist in einem Trank versiegelt.",
 		"Your progress is sealed in a potion.")
@@ -125,11 +185,11 @@ func init() {
 		"There is nowhere to store a potion here (saving disabled).")
 	add(KeyVerbHint,
 		"Sprich mit dem Verlies: look · go <Richtung> · take <Ding> · "+
-			"inspect <Ding> · wear <Ding> · inventory. Dinge kannst du auch per "+
-			"Nummer wählen (z. B. »take 1«). Befehle wie /help beginnen mit »/«.",
+			"inspect <Ding> · wear <Ding> · solve <Lösung> · inventory. Dinge wählst "+
+			"du auch per Nummer (»take 1«). Befehle wie /help beginnen mit »/«.",
 		"Speak to the dungeon: look · go <direction> · take <thing> · "+
-			"inspect <thing> · wear <thing> · inventory. You can also pick things by "+
-			"number (e.g. \"take 1\"). Commands like /help begin with \"/\".")
+			"inspect <thing> · wear <thing> · solve <answer> · inventory. You can pick "+
+			"things by number (\"take 1\"). Commands like /help begin with \"/\".")
 	add(KeyEmptyInfo,
 		"Du schweigst. Tippe einen Befehl — »look« zum Umsehen, »go north« zum "+
 			"Gehen, oder »/help« für die volle Schriftrolle.",

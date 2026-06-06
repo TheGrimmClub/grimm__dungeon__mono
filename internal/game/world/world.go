@@ -3,15 +3,28 @@
 // Dynamic per-player state (position, inventory) lives in package entity.
 package world
 
-import "strings"
+import (
+	"strings"
 
-// Exit is a directed connection from one room to another. Locked/Hint exist for
-// forward-compatibility with Phase 2 puzzle gating; Phase 1 content leaves them
-// unset (every exit open).
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/puzzle"
+)
+
+// Exit is a directed connection from one room to another. If Puzzle is set, the
+// exit is locked until that puzzle is solved.
 type Exit struct {
 	To     string `yaml:"to"`
-	Locked bool   `yaml:"locked,omitempty"`
-	Hint   string `yaml:"hint,omitempty"`
+	Puzzle string `yaml:"puzzle,omitempty"`
+}
+
+// Puzzle is an authored challenge: a German prompt, an acceptance check
+// (puzzle.Spec), and the text shown on success plus an optional hint.
+type Puzzle struct {
+	Kind    string      `yaml:"kind"`
+	ID      string      `yaml:"id"`
+	Prompt  string      `yaml:"prompt"`
+	Success string      `yaml:"success"`
+	Hint    string      `yaml:"hint"`
+	Check   puzzle.Spec `yaml:"check"`
 }
 
 // Room is a single location in the dungeon. Exits are keyed by canonical
@@ -42,9 +55,10 @@ type Item struct {
 
 // World is the assembled dungeon graph.
 type World struct {
-	Rooms map[string]*Room
-	Items map[string]*Item
-	Start string
+	Rooms   map[string]*Room
+	Items   map[string]*Item
+	Puzzles map[string]*Puzzle
+	Start   string
 }
 
 // Room returns the room by id, or nil.
@@ -52,6 +66,9 @@ func (w *World) Room(id string) *Room { return w.Rooms[id] }
 
 // Item returns the item by id, or nil.
 func (w *World) Item(id string) *Item { return w.Items[id] }
+
+// Puzzle returns the puzzle by id, or nil.
+func (w *World) Puzzle(id string) *Puzzle { return w.Puzzles[id] }
 
 // canonicalDirections maps the input a player might type to the canonical
 // direction key used in room exits. Commands are English (north/south/...); a

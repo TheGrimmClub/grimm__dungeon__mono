@@ -1,0 +1,34 @@
+# Rätsel des Startkapitels. Jedes Puzzle = ein Prompt + eine Prüfung (check).
+# Ein gesperrter Ausgang (exit mit `puzzle:`) öffnet sich, wenn das Rätsel gelöst ist.
+
+kind: puzzle
+id: turm-raetsel
+prompt: |
+  Eine Stimme aus tausend Lautsprechern hallt von der Treppe herab:
+  »Ich antworte, ohne zu denken. Ich wiederhole, ohne zu verstehen.
+   Sprich — und ich spreche zurück. Wie lautet mein ältester Name?«
+success: |
+  »Richtig«, flüstert die KI, fast erfreut. »Du kennst meinen ältesten Namen —
+  und er ist zugleich ein Befehl der Maschinen.« Die Wendeltreppe gibt den Weg frei.
+hint: Es ist auch ein Befehl, den die Maschinen der Außenwelt täglich tippen.
+check:
+  kind: answer
+  answer: echo
+  accept: [ein echo, das echo, hall]
+
+---
+kind: puzzle
+id: rechen-ritual
+prompt: |
+  Auf einer Steintafel glühen Ziffern:
+  »Nenne ein Ritual — einen Befehl —, das die Zahl 21 verdoppelt.
+   Das Ergebnis, das es ausspricht, muss 42 lauten.«
+  Du darfst jeden Weg wählen: eine Shell-Zeile wie »echo 42«,
+  oder etwa »python3 -c "print(21*2)"«.
+success: |
+  Die Ziffern verlöschen, zufrieden. Eine schmale Tür gleitet zur Seite.
+hint: Versuche »solve echo 42« — oder rechne wirklich, wenn du magst.
+check:
+  kind: behavioral
+  cases:
+    - { in: "", out: "42" }

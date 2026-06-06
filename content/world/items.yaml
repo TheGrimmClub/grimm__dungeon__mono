@@ -70,3 +70,12 @@ description: |
   Ein klarer Kristall, in dem Licht pulst wie ein Herzschlag. Er fühlt sich warm
   an — als trüge er den ersten Funken einer echten Intelligenz in sich.
 takeable: true
+
+---
+kind: item
+id: runenchip
+name: Runenchip
+description: |
+  Ein winziger Chip, in den uralte Runen geätzt sind. Hält man ihn ins Licht,
+  scheinen die Runen leise zu rechnen.
+takeable: true

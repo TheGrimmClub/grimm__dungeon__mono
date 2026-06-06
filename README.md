@@ -11,9 +11,13 @@ and `/alchemist` — version control reimagined as potion brewing).
 
 ## Status
 
-**Phase 0 — Foundation.** Runnable REPL with a German banner, `/help`, `/quit`
-and a hidden `import antigravity` easter egg. The full roadmap lives in the
-approved plan; see also [`docs/design`](docs/design).
+**Through Phase 2 — Puzzles.** A Bubble Tea dungeon you walk in English verbs
+(`look`, `go north`, `take 1`, `wear helm`, `solve echo`) while the world answers
+in German. Wearing the headlamp floods the terminal with colour; doors are gated
+by puzzles — a riddle (`answer`) and a "choose your path" `behavioral` check
+(Python/Go/CLI), backed by `internal/puzzle` + `internal/runner`. Pick a class
+with `/class`. Save/`/save`, history, hidden `import antigravity`. Roadmap: the
+approved plan and [`docs/design`](docs/design).
 
 ## Quick start
 

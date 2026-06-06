@@ -48,9 +48,11 @@ description: |
   Regale bis zur Decke, voll mit Büchern, die leise summen. Manche Seiten sind
   aus Pergament, andere aus Licht. Wer hier liest, hört zugleich das Rechnen
   einer alten Maschine, die jede Geschichte zu Ende denkt.
-  Nach Westen (west) geht es zurück in die Halle.
+  Nach Westen (west) geht es zurück in die Halle. Im Osten (east) glüht eine
+  schmale Tür voller Ziffern — sie scheint eine Rechenaufgabe zu verlangen.
 exits:
   west: { to: halle }
+  east: { to: rechenkammer, puzzle: rechen-ritual }
 items:
   - maerchenbuch
 
@@ -62,9 +64,10 @@ description: |
   Funken aus Millionen winziger Roboter wirbeln über einem kalten Amboss. Hier
   schmiedete einst ein Meister Dinge, die kleiner sind als ein Gedanke. Eine
   Wendeltreppe führt hinauf (up), der Gang nach Süden (south) zurück in die Halle.
+  Von oben hallt eine Stimme — die Treppe gibt nur preis, wer ihr Rätsel löst.
 exits:
   south: { to: halle }
-  up: { to: turm }
+  up: { to: turm, puzzle: turm-raetsel }
 items:
   - nanostaub
   - ritualbuch
@@ -81,8 +84,22 @@ description: |
   Ganz oben, wo der Wind durch Serverschränke singt, wacht eine Intelligenz,
   die niemals schläft. Tausend Lichter atmen im Gleichklang. In der Mitte des
   Raums schwebt etwas Klares und Helles — und es scheint dich zu erwarten.
+  Die KI flüstert: »Du bist noch namenlos, Human. Wähle deinen Pfad — tippe /class.«
   Nur die Treppe nach unten (down) führt zurück.
 exits:
   down: { to: werkstatt }
 items:
   - kristallkern
+
+---
+kind: room
+id: rechenkammer
+title: Die Rechenkammer
+description: |
+  Ein enger Raum, dessen Wände mit leuchtenden Zahlenkolonnen bedeckt sind.
+  Sie zählen, addieren, verdoppeln — endlos, als rechne der Fels selbst.
+  Nach Westen (west) geht es zurück in die Bibliothek.
+exits:
+  west: { to: bibliothek }
+items:
+  - runenchip

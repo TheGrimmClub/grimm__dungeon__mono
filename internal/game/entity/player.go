@@ -13,6 +13,7 @@ type Player struct {
 	Inventory []string        // item ids carried
 	Worn      []string        // item ids currently worn
 	Visited   map[string]bool // room ids already seen
+	Solved    map[string]bool // puzzle ids already solved
 }
 
 // NewPlayer starts a player in the given room, as a class-less "Human".
@@ -23,8 +24,20 @@ func NewPlayer(start string) *Player {
 		Inventory: []string{},
 		Worn:      []string{},
 		Visited:   map[string]bool{start: true},
+		Solved:    map[string]bool{},
 	}
 }
+
+// Solve marks a puzzle solved.
+func (p *Player) Solve(id string) {
+	if p.Solved == nil {
+		p.Solved = map[string]bool{}
+	}
+	p.Solved[id] = true
+}
+
+// HasSolved reports whether a puzzle is already solved.
+func (p *Player) HasSolved(id string) bool { return p.Solved[id] }
 
 // Wears reports whether the player is wearing the item.
 func (p *Player) Wears(id string) bool {

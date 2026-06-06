@@ -46,6 +46,8 @@ requirements:
       Puzzles are validated by one of three check kinds — answer (riddle/knowledge),
       artifact (proof of a real-world action, e.g. a reachable git repo URL), and
       behavioral (solve in Python OR Go OR a CLI one-liner; validated by I/O, not language).
+      Implemented in Phase 2 (internal/puzzle + internal/runner). Answer + behavioral are
+      wired into the dungeon; artifact placement follows in Phase 3 with the repo workflow.
     priority: must
     status: active
 

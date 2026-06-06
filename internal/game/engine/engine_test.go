@@ -44,15 +44,47 @@ func TestMovementAndBareDirection(t *testing.T) {
 	}
 }
 
-func TestGoUpFromWorkshop(t *testing.T) {
+func TestGoUpHitsTheGate(t *testing.T) {
+	// Regression: "go up" must parse as a direction (not be stripped as filler).
+	// The tower is now gated by a riddle, so going up presents the puzzle.
 	g := newGame(t)
 	g.Do("go north") // halle
 	g.Do("go north") // werkstatt
-	if got := g.Do("go up"); !strings.Contains(got, "Turm der wachen KI") {
-		t.Errorf("'go up' from the workshop did not reach the tower:\n%s", got)
+	got := g.Do("go up")
+	if strings.Contains(got, "kein Weg") {
+		t.Errorf("'go up' was not parsed as a direction:\n%s", got)
 	}
-	if got := g.Do("go down"); !strings.Contains(got, "Werkstatt des Nanoschmieds") {
-		t.Errorf("'go down' did not return to the workshop:\n%s", got)
+	if !strings.Contains(got, "wiederhole") {
+		t.Errorf("'go up' did not present the tower riddle:\n%s", got)
+	}
+}
+
+func TestSolveRiddleUnlocksTower(t *testing.T) {
+	g := newGame(t)
+	g.Do("go north")
+	g.Do("go north") // werkstatt
+	g.Do("go up")    // presents the riddle, sets it active
+	if got := g.Do("solve taube"); !strings.Contains(got, "nicht die Lösung") {
+		t.Errorf("wrong answer should fail:\n%s", got)
+	}
+	if got := g.Do("solve echo"); !strings.Contains(got, "Richtig") {
+		t.Errorf("correct answer should solve the riddle:\n%s", got)
+	}
+	if got := g.Do("go up"); !strings.Contains(got, "Turm der wachen KI") {
+		t.Errorf("tower should be reachable after solving:\n%s", got)
+	}
+}
+
+func TestBehavioralPuzzleGate(t *testing.T) {
+	g := newGame(t)
+	g.Do("go north")
+	g.Do("go east") // bibliothek; east is the behavioral gate
+	g.Do("go east") // presents the rechen-ritual
+	if got := g.Do("solve echo 42"); !strings.Contains(got, "zufrieden") {
+		t.Errorf("shell solution should pass the behavioral check:\n%s", got)
+	}
+	if got := g.Do("go east"); !strings.Contains(got, "Rechenkammer") {
+		t.Errorf("chamber should open after solving:\n%s", got)
 	}
 }
 

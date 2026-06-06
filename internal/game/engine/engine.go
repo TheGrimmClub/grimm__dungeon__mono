@@ -5,6 +5,7 @@
 package engine
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,6 +13,7 @@ import (
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/entity"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/world"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/puzzle"
 )
 
 // Game ties the static world to the dynamic player.
@@ -19,12 +21,21 @@ type Game struct {
 	world   *world.World
 	player  *entity.Player
 	palette Palette // zero value = plain (tests); app injects ColorPalette
+
+	active  string                  // id of the puzzle currently blocking the player
+	checks  map[string]puzzle.Check // lazily-built checks, keyed by puzzle id
+	workDir string                  // student's working directory (artifact/behavioral)
 }
 
 // New starts a fresh game with the player in the world's start room. The
 // default palette is plain; the app injects ColorPalette for the lit dungeon.
 func New(w *world.World) *Game {
-	return &Game{world: w, player: entity.NewPlayer(w.Start), palette: PlainPalette()}
+	return &Game{
+		world:   w,
+		player:  entity.NewPlayer(w.Start),
+		palette: PlainPalette(),
+		checks:  make(map[string]puzzle.Check),
+	}
 }
 
 // SetPalette swaps the rendering palette (the app uses ColorPalette).
@@ -50,21 +61,27 @@ type Snapshot struct {
 	Inventory []string `yaml:"inventory"`
 	Worn      []string `yaml:"worn"`
 	Visited   []string `yaml:"visited"`
+	Solved    []string `yaml:"solved"`
 }
 
 // Snapshot captures the player's progress.
 func (g *Game) Snapshot() Snapshot {
-	visited := make([]string, 0, len(g.player.Visited))
-	for id := range g.player.Visited {
-		visited = append(visited, id)
-	}
 	return Snapshot{
 		Title:     g.player.Title,
 		Location:  g.player.Location,
 		Inventory: append([]string(nil), g.player.Inventory...),
 		Worn:      append([]string(nil), g.player.Worn...),
-		Visited:   visited,
+		Visited:   keys(g.player.Visited),
+		Solved:    keys(g.player.Solved),
 	}
+}
+
+func keys(m map[string]bool) []string {
+	out := make([]string, 0, len(m))
+	for k := range m {
+		out = append(out, k)
+	}
+	return out
 }
 
 // Restore applies a snapshot, ignoring ids that no longer exist in the world so
@@ -94,7 +111,17 @@ func (g *Game) Restore(s Snapshot) {
 			g.player.Visited[id] = true
 		}
 	}
+	g.player.Solved = map[string]bool{}
+	for _, id := range s.Solved {
+		if g.world.Puzzle(id) != nil {
+			g.player.Solve(id)
+		}
+	}
 }
+
+// SetWorkDir sets the student's working directory used by artifact/behavioral
+// checks (Phase 3 points this at the alchemist repo; default "").
+func (g *Game) SetWorkDir(dir string) { g.workDir = dir }
 
 // Intro returns the description of the starting room (shown once at launch).
 func (g *Game) Intro() string { return g.look() }
@@ -123,6 +150,8 @@ func (g *Game) Do(input string) string {
 		return g.wear(rest)
 	case verbInventory[verb]:
 		return g.inventory()
+	case verbSolve[verb]:
+		return g.solve(rest)
 	default:
 		// A bare direction ("north") means "go there"; a bare number inspects
 		// that item in the room.
@@ -131,6 +160,10 @@ func (g *Game) Do(input string) string {
 		}
 		if _, ok := singleInt(fields); ok {
 			return g.inspect(fields)
+		}
+		// While a puzzle blocks the way, treat free text as an answer attempt.
+		if g.active != "" {
+			return g.solve(fields)
 		}
 		return i18n.T(i18n.KeyUnknownVerb)
 	}
@@ -158,12 +191,26 @@ func (g *Game) look() string {
 
 	b.WriteString("\n")
 	b.WriteString(i18n.T(i18n.KeyExits, g.exitList(r, lit)))
+	if g.hasLockedExit(r) {
+		b.WriteString("\n")
+		b.WriteString(i18n.T(i18n.KeyLockedFootnote))
+	}
 
 	out := b.String()
 	if !lit {
 		out = g.palette.Dim.Render(out) // the dungeon is dark
 	}
 	return out
+}
+
+// hasLockedExit reports whether any of a room's exits is still sealed.
+func (g *Game) hasLockedExit(r *world.Room) bool {
+	for _, ex := range r.Exits {
+		if ex.Puzzle != "" && !g.player.HasSolved(ex.Puzzle) {
+			return true
+		}
+	}
+	return false
 }
 
 // move resolves a direction from the words after a "go" verb. It scans for the
@@ -182,16 +229,79 @@ func (g *Game) move(rest []string) string {
 	return i18n.T(i18n.KeyUnknownDir, words[0])
 }
 
-// moveDir walks through an exit if one exists.
+// moveDir walks through an exit if one exists and is not locked. A locked exit
+// presents its puzzle instead and becomes the active puzzle.
 func (g *Game) moveDir(dir string) string {
 	r := g.world.Room(g.player.Location)
 	ex, ok := r.Exits[dir]
 	if !ok {
 		return i18n.T(i18n.KeyNoExit)
 	}
+	if ex.Puzzle != "" && !g.player.HasSolved(ex.Puzzle) {
+		g.active = ex.Puzzle
+		return g.puzzlePrompt(ex.Puzzle)
+	}
 	g.player.Location = ex.To
 	g.player.Visit(ex.To)
 	return g.look()
+}
+
+// puzzlePrompt shows a blocked puzzle's prompt and how to answer it.
+func (g *Game) puzzlePrompt(id string) string {
+	p := g.world.Puzzle(id)
+	var b strings.Builder
+	b.WriteString(strings.TrimRight(p.Prompt, "\n"))
+	b.WriteString("\n\n")
+	b.WriteString(i18n.T(i18n.KeySolveHint))
+	return b.String()
+}
+
+// solve attempts the active puzzle with the rest of the player's input.
+func (g *Game) solve(rest []string) string {
+	if g.active == "" {
+		return i18n.T(i18n.KeyNoActivePuzzle)
+	}
+	answer := strings.TrimSpace(strings.Join(rest, " "))
+	if answer == "" {
+		return i18n.T(i18n.KeySolveWhat)
+	}
+	p := g.world.Puzzle(g.active)
+	check, err := g.checkFor(g.active)
+	if err != nil {
+		return i18n.T(i18n.KeyPuzzleBroken)
+	}
+
+	res := check.Verify(context.Background(), puzzle.Input{Answer: answer, WorkDir: g.workDir})
+	if res.Passed {
+		g.player.Solve(g.active)
+		g.active = ""
+		if p.Success != "" {
+			return strings.TrimRight(p.Success, "\n")
+		}
+		return i18n.T(i18n.KeyPuzzleSolved)
+	}
+
+	msg := i18n.T(i18n.KeyPuzzleWrong)
+	if res.Detail != "" {
+		msg += " " + res.Detail
+	}
+	if p.Hint != "" {
+		msg += "\n" + i18n.T(i18n.KeyHintLabel) + " " + p.Hint
+	}
+	return msg
+}
+
+// checkFor lazily builds and caches the Check for a puzzle.
+func (g *Game) checkFor(id string) (puzzle.Check, error) {
+	if c, ok := g.checks[id]; ok {
+		return c, nil
+	}
+	c, err := puzzle.Build(g.world.Puzzle(id).Check)
+	if err != nil {
+		return nil, err
+	}
+	g.checks[id] = c
+	return c, nil
 }
 
 // take picks up a takeable item present in the room (by [number] or name).

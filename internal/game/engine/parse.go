@@ -28,6 +28,9 @@ var (
 	verbInventory = set(
 		"inventory", "inv", "i", "items", "bag",
 	)
+	verbSolve = set(
+		"solve", "answer", "antworte", "sage", "loese", "try",
+	)
 )
 
 // fillers are little words that carry no meaning for the parser (English plus a
@@ -144,17 +147,23 @@ func wordInDescription(r *world.Room, query []string) bool {
 // (what the player types).
 var exitOrder = []string{"north", "east", "south", "west", "up", "down"}
 
-// exitList renders a room's exits in a stable order, styling them when lit.
+// exitList renders a room's exits in a stable order, styling them when lit and
+// marking any door still sealed by an unsolved puzzle with a trailing "*".
 func (g *Game) exitList(r *world.Room, lit bool) string {
 	tokens := make([]string, 0, len(r.Exits))
 	for _, dir := range exitOrder {
-		if _, ok := r.Exits[dir]; ok {
-			if lit {
-				tokens = append(tokens, g.palette.Exit.Render(dir))
-			} else {
-				tokens = append(tokens, dir)
-			}
+		ex, ok := r.Exits[dir]
+		if !ok {
+			continue
 		}
+		label := dir
+		if ex.Puzzle != "" && !g.player.HasSolved(ex.Puzzle) {
+			label += "*"
+		}
+		if lit {
+			label = g.palette.Exit.Render(label)
+		}
+		tokens = append(tokens, label)
 	}
 	if len(tokens) == 0 {
 		return "—"

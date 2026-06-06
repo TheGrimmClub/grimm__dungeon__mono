@@ -99,10 +99,25 @@ decisions:
     title: Player addressed as "Human" until a class is chosen
     decision: >
       New players are addressed as "Human" (prompt "Human> "). Later they pick a class
-      (Alchemist, Hunter, …) which changes the title.
+      (Alchemist, Hunter, …) which changes the title. Implemented in Phase 2 via the
+      `/class` command; classes currently only change the title, abilities come later.
     status: accepted
     date: 2026-06-06
     rationale: Cooler and class-neutral at the start; sets up a future class system.
+
+  - id: D016
+    title: Puzzle attempt model — locked doors + `solve`
+    decision: >
+      An exit may reference a puzzle (`puzzle:` in YAML); going there shows the prompt and
+      makes it the active puzzle. The player answers with `solve <…>` (free text also works
+      while a puzzle is active). The three check kinds (D003) live in internal/puzzle and run
+      via internal/runner. Checks currently run synchronously inside session.Submit — fine
+      for riddles and fast shell checks; long-running checks (real git/network, heavy
+      programs) should move to an async tea.Cmd before they're placed in the main path.
+    status: accepted
+    date: 2026-06-06
+    rationale: Simple, discoverable gating; the Check abstraction backs doors, loot and battles.
+    requirements: [R003, R005, R013]
 
   # --- Open / deferred (recorded as proposed; confirm before implementing) ---
   - id: D009

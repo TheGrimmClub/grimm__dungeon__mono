@@ -5,6 +5,7 @@ import (
 	"io"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/state"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
 )
@@ -20,6 +21,7 @@ var gameVerbs = []gameVerb{
 	{"take <n|name>", i18n.KeyVTake},
 	{"inspect <n|name>", i18n.KeyVInspect},
 	{"wear <n|name>", i18n.KeyVWear},
+	{"solve <solution>", i18n.KeyVSolve},
 	{"inventory", i18n.KeyVInventory},
 }
 
@@ -52,6 +54,15 @@ func (s *Session) registerBuiltins() {
 	})
 
 	s.reg.Register(&command.Command{
+		Name:    "class",
+		Summary: i18n.T(i18n.KeyCmdClass),
+		Run: func(ctx *command.Context, args []string) error {
+			s.chooseClass(ctx.Out, args)
+			return nil
+		},
+	})
+
+	s.reg.Register(&command.Command{
 		Name:    "quit",
 		Summary: i18n.T(i18n.KeyCmdQuit),
 		Run: func(ctx *command.Context, _ []string) error {
@@ -69,6 +80,25 @@ func (s *Session) registerBuiltins() {
 			return nil
 		},
 	})
+}
+
+// chooseClass lists the paths, or sets one if the player named it.
+func (s *Session) chooseClass(out io.Writer, args []string) {
+	if len(args) == 0 {
+		fmt.Fprintln(out, i18n.T(i18n.KeyClassHeader))
+		for _, c := range engine.Classes() {
+			fmt.Fprintf(out, "  %-10s — %s\n", c.ID, c.Blurb)
+		}
+		fmt.Fprintln(out)
+		fmt.Fprintln(out, i18n.T(i18n.KeyClassChoose))
+		return
+	}
+	c, ok := s.game.ChooseClass(args[0])
+	if !ok {
+		fmt.Fprintln(out, i18n.T(i18n.KeyClassUnknown, args[0]))
+		return
+	}
+	fmt.Fprintln(out, i18n.T(i18n.KeyClassChosen, c.Title))
 }
 
 // printHelp renders both the slash commands and the game verbs, aligned.
