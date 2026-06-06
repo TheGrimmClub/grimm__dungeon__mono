@@ -88,7 +88,21 @@ decisions:
 
   - id: D011
     title: Game-save location
-    decision: TBD — local save file (e.g. ~/.grimm/save.yaml) vs inside the student repo.
-    status: proposed
+    decision: Local save file at ~/.grimm/save.yaml (implemented in Phase 1).
+    status: accepted
     date: 2026-06-06
-    rationale: Keep game progress separate from student work artifacts.
+    rationale: Keeps game progress separate from student work artifacts (D005).
+    requirements: [R006]
+
+  - id: D012
+    title: Adopt Task (taskfile.dev) as runner and in-game concept
+    decision: >
+      Task is the canonical task runner (Taskfile.yaml at the repo root; the Makefile is
+      removed; CI runs `task ci`). Task is also a teaching subject: automation appears in
+      the fiction as "rituals". Phase 1 seeds a readable in-world Taskfile (the Ritualbuch
+      item); Phase 2 will add an interactive automation puzzle.
+    status: accepted
+    date: 2026-06-06
+    rationale: One real, cross-platform automation tool serves both project hygiene and curriculum.
+    requirements: [R013]
+    supersedes: makefile-from-phase-0

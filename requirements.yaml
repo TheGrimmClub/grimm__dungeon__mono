@@ -106,3 +106,14 @@ requirements:
       choice) and register it with grimm via a simple contract. Their one real authoring moment.
     priority: could
     status: active
+
+  - id: R013
+    title: Teach automation with Task (taskfile.dev)
+    description: >
+      Introduce students to a real automation tool, Task. It is the project's own task
+      runner AND an in-game concept: automation is framed as writing "rituals" (named
+      sequences of steps) so they are never repeated by hand. Reading a Taskfile is itself
+      a code-reading lesson (R001). A Phase 2 automation puzzle will have students author
+      and run a Taskfile.
+    priority: should
+    status: active

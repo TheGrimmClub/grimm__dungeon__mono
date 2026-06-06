@@ -17,14 +17,22 @@ approved plan; see also [`docs/design`](docs/design).
 
 ## Quick start
 
+Tasks are run with [Task](https://taskfile.dev) (`brew install go-task` or see
+the [install docs](https://taskfile.dev/installation/)). Run `task` to list them.
+
 ```sh
-make run          # build & run grimm
-make check        # go vet + tests
-make build        # binaries into ./bin (grimm, alchemist)
+task run          # build & run grimm
+task check        # go vet + tests
+task ci           # full gate: fmt check + vet + test + build
+task build        # binaries into ./bin (grimm, alchemist)
 ```
 
 Inside grimm: type `/help` for the scroll of commands, `/quit` to leave. Whisper
 the old Python words to the dungeon for a surprise.
+
+> Why Task? The `Taskfile.yaml` is also a lesson: a *ritual* (task) bundles many
+> steps under one name. In the dungeon, automation is taught as exactly that —
+> see [`docs/design/automation-task.md`](docs/design/automation-task.md).
 
 ## Layout
 

@@ -1,0 +1,104 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Taskfile.yaml — the canonical task runner for the grimm monorepo.
+# Install Task: https://taskfile.dev/installation/  ·  Run `task` to list tasks.
+#
+# This file is also a teaching artifact: a "ritual" (task) bundles many steps
+# under one name so you never repeat them by hand. See docs/design/automation-task.md.
+version: "3"
+
+vars:
+  BIN: bin
+  PLATFORMS: darwin/amd64 darwin/arm64 linux/amd64 windows/amd64
+
+tasks:
+  default:
+    desc: List available tasks
+    cmds:
+      - task --list
+    silent: true
+
+  build:
+    desc: Build grimm and alchemist into ./bin
+    cmds:
+      - mkdir -p {{.BIN}}
+      - go build -o {{.BIN}}/grimm ./cmd/grimm
+      - go build -o {{.BIN}}/alchemist ./cmd/alchemist
+
+  run:
+    desc: "Build and run grimm (usage: task run -- <args>)"
+    cmds:
+      - go run ./cmd/grimm {{.CLI_ARGS}}
+
+  alchemist:
+    desc: "Run the standalone alchemist tool (usage: task alchemist -- <args>)"
+    cmds:
+      - go run ./cmd/alchemist {{.CLI_ARGS}}
+
+  test:
+    desc: Run the test suite
+    cmds:
+      - go test ./...
+
+  vet:
+    desc: Run go vet
+    cmds:
+      - go vet ./...
+
+  fmt:
+    desc: Format all Go code
+    cmds:
+      - gofmt -w .
+
+  fmt:check:
+    desc: Fail if any Go file is not gofmt-clean
+    cmds:
+      - |
+        unformatted=$(gofmt -l .)
+        if [ -n "$unformatted" ]; then
+          echo "These files are not gofmt-clean:"; echo "$unformatted"; exit 1
+        fi
+
+  lint:
+    desc: Run golangci-lint if it is installed
+    cmds:
+      - |
+        if command -v golangci-lint >/dev/null 2>&1; then
+          golangci-lint run
+        else
+          echo "golangci-lint not installed — skipping (CI runs it)"
+        fi
+
+  tidy:
+    desc: Tidy go.mod / go.sum
+    cmds:
+      - go mod tidy
+
+  check:
+    desc: Quick local gate — vet + tests
+    cmds:
+      - task: vet
+      - task: test
+
+  ci:
+    desc: Full gate (used by CI) — format check, vet, test, build
+    cmds:
+      - task: fmt:check
+      - task: vet
+      - task: test
+      - task: build
+
+  cross:
+    desc: Cross-compile grimm for all target platforms into ./bin
+    cmds:
+      - mkdir -p {{.BIN}}
+      - for: { var: PLATFORMS, split: " ", as: PLATFORM }
+        cmd: |
+          os="${PLATFORM%/*}"; arch="${PLATFORM#*/}"; ext=""
+          [ "$os" = "windows" ] && ext=".exe"
+          echo "building $os/$arch"
+          GOOS="$os" GOARCH="$arch" go build -o {{.BIN}}/grimm-$os-$arch$ext ./cmd/grimm
+
+  clean:
+    desc: Remove build output
+    cmds:
+      - rm -rf {{.BIN}}

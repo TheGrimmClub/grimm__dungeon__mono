@@ -38,6 +38,29 @@ takeable: true
 
 ---
 kind: item
+id: ritualbuch
+name: Ritualbuch des Alchemisten
+description: |
+  Ein aufgeschlagenes Buch. Jemand hat wiederkehrende Zauber als »Rituale«
+  notiert — statt jeden Schritt von Hand zu sprechen, ruft man ein Ritual bei
+  seinem Namen, und alle Schritte geschehen von selbst:
+
+      version: "3"
+      tasks:
+        brauen:
+          cmds:
+            - echo "Kessel erhitzen"
+            - echo "Zutaten hinzufügen"
+            - echo "drei Mal umrühren"
+
+  Am Rand steht in feiner Schrift: »Sprich »task brauen«, und das Buch tut den
+  Rest. Wer ein Ritual einmal schreibt, wiederholt es nie wieder von Hand.«
+  Es heißt, dieses Buch sei in Wahrheit ein echtes Werkzeug — die Meister der
+  Außenwelt nennen es Task (taskfile.dev).
+takeable: true
+
+---
+kind: item
 id: kristallkern
 name: Kristallkern
 description: |

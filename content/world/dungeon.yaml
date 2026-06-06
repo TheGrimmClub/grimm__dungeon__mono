@@ -63,6 +63,7 @@ exits:
   oben: { to: turm }
 items:
   - nanostaub
+  - ritualbuch
 
 ---
 kind: room

@@ -21,23 +21,15 @@ jobs:
           go-version: '1.24'
           cache: true
 
-      - name: Verify formatting
-        run: |
-          unformatted=$(gofmt -l .)
-          if [ -n "$unformatted" ]; then
-            echo "These files are not gofmt-clean:"; echo "$unformatted"; exit 1
-          fi
+      - name: Install Task
+        uses: arduino/setup-task@v2
+        with:
+          version: 3.x
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Vet
-        run: go vet ./...
-
-      - name: Test
-        run: go test -race ./...
-
-      - name: Build
-        run: |
-          go build ./cmd/grimm
-          go build ./cmd/alchemist
+      # Dogfood the same gate developers run locally: `task ci`.
+      - name: CI gate (fmt check + vet + test + build)
+        run: task ci
 
   lint:
     name: golangci-lint
