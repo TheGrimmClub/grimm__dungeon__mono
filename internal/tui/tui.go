@@ -168,18 +168,30 @@ func (m model) geometry() (vpWidth, vpHeight int, showHUD bool) {
 	return vpWidth, vpHeight, showHUD
 }
 
-// relayout resizes the viewport for the current geometry and refreshes content.
+// relayout resizes the viewport for the current geometry, bounds the input so
+// the prompt line can never wrap (a wrapped prompt desyncs Bubble Tea's renderer
+// and eats the line above), and refreshes content.
 func (m *model) relayout() {
 	if !m.ready {
 		return
 	}
 	w, h, _ := m.geometry()
 	m.vp.Width, m.vp.Height = w, h
+
+	// Keep "Human> " + input on a single row of the full terminal width.
+	iw := m.width - lipgloss.Width(m.promptLabel()) - 1
+	if iw < 1 {
+		iw = 1
+	}
+	m.input.Width = iw
+
 	m.refresh()
 }
 
 // refresh rebuilds the viewport content from the transcript and re-styles the
-// prompt for the current light state, then scrolls to the bottom.
+// prompt for the current light state, then scrolls to the bottom. The viewport
+// truncates over-wide lines itself, so the rendered frame height stays exact
+// (the renderer never desyncs from content).
 func (m *model) refresh() {
 	m.input.PromptStyle = m.promptStyle()
 	if !m.ready || m.vp.Height < 1 {

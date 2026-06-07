@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/content"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
@@ -98,6 +99,33 @@ func TestExecDoneAppendsNote(t *testing.T) {
 	m, _ = step(t, m, execDoneMsg{after: "zurück im Verlies"})
 	if joined := strings.Join(m.transcript, "\n"); !strings.Contains(joined, "zurück im Verlies") {
 		t.Errorf("resume note not appended:\n%s", joined)
+	}
+}
+
+// TestPromptNeverWraps guards the line-deletion bug: the prompt row (outside
+// the viewport) must never exceed the terminal width, even with long input or
+// the empty-state placeholder, or Bubble Tea's renderer desyncs and erases a
+// line. Also checks transcript lines stay within the viewport width.
+func TestPromptNeverWraps(t *testing.T) {
+	for _, width := range []int{40, 64, 100} {
+		m := testModelWithWorkDir(t, t.TempDir())
+		m, _ = step(t, m, tea.WindowSizeMsg{Width: width, Height: 24})
+
+		// Wear the helmet so the HUD narrows the viewport, then type a long line.
+		m.input.SetValue("wear 1")
+		m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+		m.input.SetValue(strings.Repeat("go north and then ", 12))
+		m.relayout()
+
+		prompt := m.promptLabel() + m.input.View()
+		if w := lipgloss.Width(prompt); w > width {
+			t.Errorf("width=%d: prompt row is %d cols wide (would wrap)", width, w)
+		}
+		for _, l := range strings.Split(m.vp.View(), "\n") {
+			if lipgloss.Width(l) > m.vp.Width {
+				t.Errorf("width=%d: transcript line exceeds viewport width %d: %q", width, m.vp.Width, l)
+			}
+		}
 	}
 }
 
