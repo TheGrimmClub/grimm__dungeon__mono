@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/state"
@@ -64,6 +65,15 @@ func (s *Session) registerBuiltins() {
 	})
 
 	s.reg.Register(&command.Command{
+		Name:    "alchemist",
+		Summary: i18n.T(i18n.KeyCmdAlchemist),
+		Run: func(ctx *command.Context, args []string) error {
+			s.runAlchemist(ctx.Out, args)
+			return nil
+		},
+	})
+
+	s.reg.Register(&command.Command{
 		Name:    "voice",
 		Summary: i18n.T(i18n.KeyCmdVoice),
 		Run: func(ctx *command.Context, args []string) error {
@@ -90,6 +100,20 @@ func (s *Session) registerBuiltins() {
 			return nil
 		},
 	})
+}
+
+// runAlchemist drives the in-game potion/git tool in the student work dir.
+func (s *Session) runAlchemist(out io.Writer, args []string) {
+	if s.alch == nil {
+		fmt.Fprintln(out, i18n.T(i18n.KeyAlchemistNoDir))
+		return
+	}
+	msg, err := alchemist.Dispatch(s.alch, args)
+	if err != nil {
+		fmt.Fprintln(out, err.Error())
+		return
+	}
+	fmt.Fprintln(out, msg)
 }
 
 // toggleVoice turns narration on/off ("/voice", "/voice on", "/voice off").

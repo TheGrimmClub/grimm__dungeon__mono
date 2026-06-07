@@ -18,8 +18,11 @@ by puzzles — a riddle (`answer`) and a "choose your path" `behavioral` check
 (Python/Go/CLI), backed by `internal/puzzle` + `internal/runner`. Pick a class
 with `/class`. Wearing the helmet also raises a **HUD** (inventory + map on the
 right) and a **voice** that reads the German aloud (`/voice`; set
-`GRIMM_VOICE=Anna` on macOS for a German voice). Save/`/save`, history, hidden
-`import antigravity`. Roadmap: the approved plan and [`docs/design`](docs/design).
+`GRIMM_VOICE=Anna` on macOS for a German voice). Version
+your work with **`/alchemist`** (git as potion-brewing: `init`/`brew`/`bottle`/…)
+in `~/.grimm/work` — one door (the Archiv) opens only once you've created your
+own repository. Save/`/save`, history, hidden `import antigravity`. Roadmap: the
+approved plan and [`docs/design`](docs/design).
 
 ## Quick start
 

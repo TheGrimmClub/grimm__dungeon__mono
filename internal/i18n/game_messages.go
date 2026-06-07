@@ -48,12 +48,16 @@ const (
 	KeyVoiceOn          = "voice.on"
 	KeyVoiceOff         = "voice.off"
 	KeyVoiceUnavailable = "voice.unavailable"
-	KeySaved            = "game.saved"
-	KeySaveFailed       = "game.save_failed"
-	KeySaveDisabled     = "game.save_disabled"
-	KeyContinued        = "game.continued"
-	KeyVerbHint         = "game.verb_hint"
-	KeyEmptyInfo        = "game.empty_info"
+
+	// Alchemist (git)
+	KeyCmdAlchemist   = "cmd.alchemist"
+	KeyAlchemistNoDir = "alchemist.no_dir"
+	KeySaved          = "game.saved"
+	KeySaveFailed     = "game.save_failed"
+	KeySaveDisabled   = "game.save_disabled"
+	KeyContinued      = "game.continued"
+	KeyVerbHint       = "game.verb_hint"
+	KeyEmptyInfo      = "game.empty_info"
 
 	// Help: section headers and one-line descriptions of the game verbs.
 	KeyHelpCmdHeader  = "help.cmd_header"
@@ -197,6 +201,13 @@ func init() {
 	add(KeyVoiceUnavailable,
 		"Dieser Rechner hat keine Stimme, die vorlesen könnte.",
 		"This machine has no voice to read aloud.")
+
+	add(KeyCmdAlchemist,
+		"braue mit dem Alchemisten (git): /alchemist <trank>",
+		"brew with the alchemist (git): /alchemist <potion>")
+	add(KeyAlchemistNoDir,
+		"Hier gibt es keinen Kessel — es ist kein Arbeitsverzeichnis eingerichtet.",
+		"There is no cauldron here — no working directory is set up.")
 	add(KeySaved,
 		"Dein Fortschritt ist in einem Trank versiegelt.",
 		"Your progress is sealed in a potion.")

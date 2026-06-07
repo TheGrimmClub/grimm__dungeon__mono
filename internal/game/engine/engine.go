@@ -262,10 +262,12 @@ func (g *Game) solve(rest []string) string {
 		return i18n.T(i18n.KeyNoActivePuzzle)
 	}
 	answer := strings.TrimSpace(strings.Join(rest, " "))
-	if answer == "" {
+	p := g.world.Puzzle(g.active)
+	// Riddles need a typed answer; artifact/behavioral checks read the world, so
+	// a bare `solve` (after doing the real-world action) is allowed for them.
+	if answer == "" && p.Check.Kind == "answer" {
 		return i18n.T(i18n.KeySolveWhat)
 	}
-	p := g.world.Puzzle(g.active)
 	check, err := g.checkFor(g.active)
 	if err != nil {
 		return i18n.T(i18n.KeyPuzzleBroken)

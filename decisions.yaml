@@ -49,12 +49,31 @@ decisions:
     requirements: [R006]
 
   - id: D006
-    title: alchemist placement
-    decision: Shared library (internal/alchemist) exposed as both cmd/alchemist and /alchemist.
+    title: alchemist placement and language
+    decision: >
+      Shared library (internal/alchemist) exposed as both cmd/alchemist and /alchemist.
+      Implemented in Go over git (Init/Add/Brew/Bottle/Discard/Clean/Look via internal/
+      runner) so grimm stays a single binary and can introspect the repo for artifact
+      checks. NOTE: the user's original alchemist was a Python prototype (uv/pytest); this
+      Go reimplementation supersedes it for the monorepo. The Python tool can be retired
+      or kept as a separate standalone — open, low-stakes.
     status: accepted
-    date: 2026-06-06
-    rationale: One codebase, both the standalone "real tool" and the in-game surface.
+    date: 2026-06-07
+    rationale: One codebase, single binary, both the standalone tool and the in-game surface.
     requirements: [R006, R007]
+
+  - id: D020
+    title: Student work directory
+    decision: >
+      The student's repo lives at ~/.grimm/work (next to the save), created on launch and
+      passed to the engine (artifact/behavioral checks) and to /alchemist. Phase 3 wires
+      the first artifact-gated door (Archiv), opened by `/alchemist init` then `solve`. The
+      brew/bottle-gated doors and the "submit your remote repo URL" check arrive once the
+      student can create files in-game (Phase 4 editor/terminal).
+    status: accepted
+    date: 2026-06-07
+    rationale: A real repo makes version control the literal key to a door (R006).
+    requirements: [R005, R006]
 
   - id: D007
     title: Module path

@@ -81,3 +81,12 @@ description: |
   Ein winziger Chip, in den uralte Runen geätzt sind. Hält man ihn ins Licht,
   scheinen die Runen leise zu rechnen.
 takeable: true
+
+---
+kind: item
+id: zeitsiegel
+name: Zeitsiegel
+description: |
+  Ein Siegel, das einen Augenblick einfriert. Wer es trägt, kann jeden früheren
+  Zustand zurückrufen — wie ein Commit, der niemals verblasst.
+takeable: true

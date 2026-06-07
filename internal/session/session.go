@@ -7,8 +7,10 @@ package session
 import (
 	"bytes"
 	"errors"
+	"os"
 	"strings"
 
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
@@ -29,6 +31,8 @@ type Session struct {
 
 	player  voice.Player // text-to-speech backend (Noop by default)
 	voiceOn bool         // whether narration is currently enabled
+
+	alch *alchemist.Alchemist // git-as-potions in the student work dir ("" => unset)
 }
 
 // New builds a session around a game. savePath may be "" to disable saving.
@@ -48,6 +52,16 @@ func (s *Session) SetVoice(p voice.Player) {
 	if p != nil {
 		s.player = p
 	}
+}
+
+// SetWorkDir points /alchemist at the student's working directory, creating it
+// if needed so the first potion can be brewed there.
+func (s *Session) SetWorkDir(dir string) {
+	if dir == "" {
+		return
+	}
+	_ = os.MkdirAll(dir, 0o755)
+	s.alch = alchemist.New(dir)
 }
 
 // Game exposes the underlying engine (the TUI reads Title/Lit from it).

@@ -5,6 +5,8 @@ package app
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/assets"
@@ -52,9 +54,29 @@ func NewSession(savePath string) (*session.Session, string, error) {
 		}
 	}
 
+	if dir := workDir(savePath); dir != "" {
+		game.SetWorkDir(dir) // artifact/behavioral checks see the student repo
+	}
+
 	sess := session.New(game, savePath)
 	sess.SetVoice(voice.New()) // OS text-to-speech; Noop where unavailable
+	if dir := workDir(savePath); dir != "" {
+		sess.SetWorkDir(dir) // /alchemist brews here
+	}
 	return sess, intro(game, continued), nil
+}
+
+// workDir returns the student's working directory, next to the save file
+// (~/.grimm/work), creating it if needed. Returns "" if it can't be created.
+func workDir(savePath string) string {
+	if savePath == "" {
+		return ""
+	}
+	dir := filepath.Join(filepath.Dir(savePath), "work")
+	if err := os.MkdirAll(dir, 0o755); err != nil {
+		return ""
+	}
+	return dir
 }
 
 // intro composes the banner, welcome, optional "continued" note, the starting

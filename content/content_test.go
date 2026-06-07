@@ -17,11 +17,11 @@ func TestEmbeddedDungeonLoads(t *testing.T) {
 	if w.Start != "tor" {
 		t.Errorf("start room = %q, want tor", w.Start)
 	}
-	if len(w.Rooms) != 6 {
-		t.Errorf("rooms = %d, want 6", len(w.Rooms))
+	if len(w.Rooms) != 7 {
+		t.Errorf("rooms = %d, want 7", len(w.Rooms))
 	}
-	if len(w.Puzzles) != 2 {
-		t.Errorf("puzzles = %d, want 2", len(w.Puzzles))
+	if len(w.Puzzles) != 3 {
+		t.Errorf("puzzles = %d, want 3", len(w.Puzzles))
 	}
 	// Spot-check the reward loot in the final room.
 	if it := w.Item("kristallkern"); it == nil || !it.Takeable {

@@ -32,11 +32,13 @@ description: |
   Ranken aus Glasfaser umschlingen reglose Androiden, die wie verzauberte
   Gestalten an den Wänden lehnen. Einer von ihnen blinzelt im Takt eines
   langsamen Herzschlags — schläft er, oder träumt er von Strom?
-  Gänge führen nach Süden (south) zurück, nach Osten (east) und weiter nach Norden (north).
+  Gänge führen nach Süden (south) zurück, nach Osten (east) und weiter nach
+  Norden (north). Im Westen (west) sperrt eine vergitterte Tür aus Code den Weg.
 exits:
   south: { to: tor }
   east: { to: bibliothek }
   north: { to: werkstatt }
+  west: { to: archiv, puzzle: repo-tor }
 items:
   - androide
 
@@ -103,3 +105,16 @@ exits:
   west: { to: bibliothek }
 items:
   - runenchip
+
+---
+kind: room
+id: archiv
+title: Das Archiv der Versionen
+description: |
+  Endlose Regale voller Schnappschüsse — jeder Augenblick des Verlieses, für
+  immer festgehalten. Hier vergisst nichts und niemand; jede Fassung bleibt
+  abrufbar. Nach Osten (east) geht es zurück in die Halle.
+exits:
+  east: { to: halle }
+items:
+  - zeitsiegel

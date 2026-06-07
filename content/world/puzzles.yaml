@@ -32,3 +32,18 @@ check:
   kind: behavioral
   cases:
     - { in: "", out: "42" }
+
+---
+kind: puzzle
+id: repo-tor
+prompt: |
+  Eine vergitterte Tür, gewoben aus Code. Eine Inschrift leuchtet:
+  »Nur wer einen eigenen Kessel besitzt, tritt ein. Erschaffe dein Repository,
+   dann sprich das Wort.«
+success: |
+  Die Gitter lösen sich in Lichtfäden auf — dein eigenes Repository hat dich
+  eingelassen. Von hier an gehört dir ein Ort, an dem nichts je verloren geht.
+hint: Tippe »/alchemist init«, um deinen Kessel zu erschaffen — dann »solve«.
+check:
+  kind: artifact
+  file: ".git/HEAD"
