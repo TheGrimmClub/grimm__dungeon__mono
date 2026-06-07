@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"errors"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
@@ -100,10 +101,36 @@ func (s *Session) Submit(line string) Result {
 }
 
 // narrate speaks engine output aloud when narration is enabled and available.
+// It reads the prose, not the UI chrome (exits, item numbers, lock footnotes,
+// the "(north)" direction hints) — those sound noisy spoken.
 func (s *Session) narrate(text string) {
 	if s.voiceOn && s.player.Available() {
-		s.player.Speak(text)
+		s.player.Speak(narratable(text))
 	}
+}
+
+var (
+	reItemNumber = regexp.MustCompile(`^\s*\[\S+\]`) // "[1] …", "[0] …"
+	reDirHint    = regexp.MustCompile(`\s*\((?:north|south|east|west|up|down)\)`)
+)
+
+// narratable reduces engine output to the speakable prose.
+func narratable(text string) string {
+	keep := make([]string, 0)
+	for _, line := range strings.Split(text, "\n") {
+		t := strings.TrimSpace(line)
+		switch {
+		case t == "",
+			reItemNumber.MatchString(t),
+			strings.HasPrefix(t, "*"),
+			strings.HasPrefix(t, "Ausgänge:"), strings.HasPrefix(t, "Exits:"),
+			strings.HasPrefix(t, "Hier liegt:"), strings.HasPrefix(t, "Here lies:"),
+			strings.HasPrefix(t, "Du trägst bei dir:"), strings.HasPrefix(t, "You are carrying:"):
+			continue
+		}
+		keep = append(keep, t)
+	}
+	return reDirHint.ReplaceAllString(strings.Join(keep, " "), "")
 }
 
 // runCommand dispatches a "/name args" line through the registry, capturing the

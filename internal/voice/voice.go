@@ -41,7 +41,13 @@ func New() Player {
 	switch runtime.GOOS {
 	case "darwin":
 		if has("say") {
-			return &osPlayer{name: "say", build: sayArgs}
+			voice := resolveMacVoice() // a German voice, since the world speaks German
+			return &osPlayer{name: "say", build: func(t string) []string {
+				if voice != "" {
+					return []string{"-v", voice, t}
+				}
+				return []string{t}
+			}}
 		}
 	case "linux":
 		if has("spd-say") {
@@ -63,11 +69,41 @@ func New() Player {
 
 func has(tool string) bool { _, err := exec.LookPath(tool); return err == nil }
 
-func sayArgs(text string) []string {
-	if v := os.Getenv("GRIMM_VOICE"); v != "" { // e.g. GRIMM_VOICE=Anna for German
-		return []string{"-v", v, text}
+// resolveMacVoice picks a German macOS voice: $GRIMM_VOICE if set, otherwise the
+// first German (de_DE) voice that `say -v '?'` reports, preferring a plain base
+// voice (e.g. "Anna") over enhanced/premium ones that may not be downloaded.
+func resolveMacVoice() string {
+	if v := os.Getenv("GRIMM_VOICE"); v != "" {
+		return v
 	}
-	return []string{text}
+	out, err := exec.Command("say", "-v", "?").Output()
+	if err != nil {
+		return ""
+	}
+	return parseMacVoices(string(out))
+}
+
+// voiceLine captures the voice name (everything before the locale) and the
+// locale code, robust to long names whose column padding collapses to one space.
+var voiceLine = regexp.MustCompile(`^(.*?)\s+([a-z]{2}_[A-Z]{2})\b`)
+
+// parseMacVoices extracts a German voice name from `say -v '?'` output.
+func parseMacVoices(out string) string {
+	var firstGerman string
+	for _, line := range strings.Split(out, "\n") {
+		m := voiceLine.FindStringSubmatch(line)
+		if m == nil || !strings.HasPrefix(m[2], "de") {
+			continue
+		}
+		name := strings.TrimSpace(m[1])
+		if firstGerman == "" {
+			firstGerman = name
+		}
+		if !strings.Contains(name, "(") { // a clean base voice like "Anna"
+			return name
+		}
+	}
+	return firstGerman
 }
 
 func powershellArgs(text string) []string {
