@@ -69,9 +69,12 @@ const (
 	KeyVerbHint       = "game.verb_hint"
 	KeyEmptyInfo      = "game.empty_info"
 
-	// Help: section headers and one-line descriptions of the game verbs.
+	// Help: section headers, table column labels, and game-verb descriptions.
 	KeyHelpCmdHeader  = "help.cmd_header"
 	KeyHelpVerbHeader = "help.verb_header"
+	KeyHelpColCmd     = "help.col_cmd"
+	KeyHelpColVerb    = "help.col_verb"
+	KeyHelpColEffect  = "help.col_effect"
 	KeyVLook          = "verb.look"
 	KeyVGo            = "verb.go"
 	KeyVTake          = "verb.take"
@@ -271,6 +274,9 @@ func init() {
 	add(KeyHelpVerbHeader,
 		"Spielbefehle (so sprichst du mit dem Verlies):",
 		"Game verbs (how you speak to the dungeon):")
+	add(KeyHelpColCmd, "Befehl", "Command")
+	add(KeyHelpColVerb, "Spielbefehl", "Game verb")
+	add(KeyHelpColEffect, "Wirkung", "Effect")
 	add(KeyVLook, "umsehen im Raum", "look around the room")
 	add(KeyVGo, "in eine Richtung gehen (north/south/east/west/up/down)",
 		"move in a direction (north/south/east/west/up/down)")

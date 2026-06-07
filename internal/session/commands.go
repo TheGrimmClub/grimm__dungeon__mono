@@ -5,6 +5,9 @@ import (
 	"io"
 	"strings"
 
+	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/lipgloss/table"
+
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
@@ -161,29 +164,43 @@ func (s *Session) chooseClass(out io.Writer, args []string) {
 	fmt.Fprintln(out, i18n.T(i18n.KeyClassChosen, c.Title))
 }
 
-// printHelp renders both the slash commands and the game verbs, aligned.
+// printHelp renders the slash commands and the game verbs as two bordered
+// tables.
 func (s *Session) printHelp(out io.Writer) {
+	cmdRows := make([][]string, 0)
+	for _, c := range s.reg.Visible() {
+		cmdRows = append(cmdRows, []string{"/" + c.Name, c.Summary})
+	}
 	fmt.Fprintln(out, i18n.T(i18n.KeyHelpCmdHeader))
-	cmds := s.reg.Visible()
-	width := 0
-	for _, c := range cmds {
-		if n := len(c.Name) + 1; n > width {
-			width = n
-		}
-	}
-	for _, c := range cmds {
-		fmt.Fprintf(out, "  %-*s  %s\n", width, "/"+c.Name, c.Summary)
-	}
+	fmt.Fprintln(out, helpTable(i18n.T(i18n.KeyHelpColCmd), cmdRows))
 
+	verbRows := make([][]string, 0, len(gameVerbs))
+	for _, v := range gameVerbs {
+		verbRows = append(verbRows, []string{v.name, i18n.T(v.descKey)})
+	}
 	fmt.Fprintln(out)
 	fmt.Fprintln(out, i18n.T(i18n.KeyHelpVerbHeader))
-	vw := 0
-	for _, v := range gameVerbs {
-		if len(v.name) > vw {
-			vw = len(v.name)
-		}
-	}
-	for _, v := range gameVerbs {
-		fmt.Fprintf(out, "  %-*s  %s\n", vw, v.name, i18n.T(v.descKey))
-	}
+	fmt.Fprintln(out, helpTable(i18n.T(i18n.KeyHelpColVerb), verbRows))
+}
+
+// helpTable renders a two-column table (name, effect) with a rounded border.
+// In a real terminal the header and name column are coloured; in tests/CI
+// (no TTY) lipgloss renders the borders plain.
+func helpTable(nameHeader string, rows [][]string) string {
+	return table.New().
+		Border(lipgloss.RoundedBorder()).
+		BorderStyle(lipgloss.NewStyle().Foreground(lipgloss.Color("8"))).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			st := lipgloss.NewStyle().Padding(0, 1)
+			switch {
+			case row == table.HeaderRow:
+				return st.Bold(true).Foreground(lipgloss.Color("14"))
+			case col == 0:
+				return st.Foreground(lipgloss.Color("11"))
+			}
+			return st
+		}).
+		Headers(nameHeader, i18n.T(i18n.KeyHelpColEffect)).
+		Rows(rows...).
+		Render()
 }
