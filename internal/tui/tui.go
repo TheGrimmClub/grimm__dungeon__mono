@@ -152,15 +152,21 @@ func (m model) View() string {
 
 // geometry computes the viewport size and whether the HUD is shown, given the
 // current terminal size and whether the helmet is on.
+//
+// Crucially it leaves a one-column right margin: a rendered line that reaches
+// the very last column makes the terminal auto-wrap the cursor, which desyncs
+// Bubble Tea's renderer and makes it erase the line above on the next repaint.
 func (m model) geometry() (vpWidth, vpHeight int, showHUD bool) {
 	vpHeight = m.height - 2 // reserve a line for the prompt + spacing
 	if vpHeight < 1 {
 		vpHeight = 1
 	}
-	vpWidth = m.width
 	showHUD = m.sess.Game().HUDActive() && m.width >= minWidthForHUD
 	if showHUD {
-		vpWidth = m.width - sidebarWidth - 1 // sidebar + a spacer column
+		// viewport + spacer + sidebar must stay one column shy of the edge.
+		vpWidth = m.width - sidebarWidth - 2
+	} else {
+		vpWidth = m.width - 1
 	}
 	if vpWidth < 1 {
 		vpWidth = 1
@@ -178,8 +184,10 @@ func (m *model) relayout() {
 	w, h, _ := m.geometry()
 	m.vp.Width, m.vp.Height = w, h
 
-	// Keep "Human> " + input on a single row of the full terminal width.
-	iw := m.width - lipgloss.Width(m.promptLabel()) - 1
+	// Keep "Human> " + input within one column of the edge. The -2 leaves room
+	// for the focused cursor cell (rendered past the text) and the right margin,
+	// so the prompt row never reaches the last column (which would auto-wrap).
+	iw := m.width - lipgloss.Width(m.promptLabel()) - 2
 	if iw < 1 {
 		iw = 1
 	}

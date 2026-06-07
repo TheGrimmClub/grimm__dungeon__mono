@@ -102,28 +102,31 @@ func TestExecDoneAppendsNote(t *testing.T) {
 	}
 }
 
-// TestPromptNeverWraps guards the line-deletion bug: the prompt row (outside
-// the viewport) must never exceed the terminal width, even with long input or
-// the empty-state placeholder, or Bubble Tea's renderer desyncs and erases a
-// line. Also checks transcript lines stay within the viewport width.
-func TestPromptNeverWraps(t *testing.T) {
-	for _, width := range []int{40, 64, 100} {
-		m := testModelWithWorkDir(t, t.TempDir())
-		m, _ = step(t, m, tea.WindowSizeMsg{Width: width, Height: 24})
+// TestNoLineReachesLastColumn guards the line-deletion bug: NO rendered line of
+// the full View may reach the terminal's last column, or it auto-wraps and
+// Bubble Tea's renderer desyncs and erases the line above. We exercise the long
+// verb hint / room text (look) with and without the HUD, plus a long input.
+func TestNoLineReachesLastColumn(t *testing.T) {
+	for _, width := range []int{40, 64, 80, 100} {
+		// Without and with the helmet (HUD narrows the viewport).
+		for _, helmet := range []bool{false, true} {
+			m := testModelWithWorkDir(t, t.TempDir())
+			m, _ = step(t, m, tea.WindowSizeMsg{Width: width, Height: 24})
+			if helmet {
+				m.input.SetValue("wear 1")
+				m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+			}
+			// Produce long output and a long pending input.
+			m.input.SetValue("look")
+			m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+			m.input.SetValue(strings.Repeat("go north and then ", 12))
+			m.relayout()
 
-		// Wear the helmet so the HUD narrows the viewport, then type a long line.
-		m.input.SetValue("wear 1")
-		m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
-		m.input.SetValue(strings.Repeat("go north and then ", 12))
-		m.relayout()
-
-		prompt := m.promptLabel() + m.input.View()
-		if w := lipgloss.Width(prompt); w > width {
-			t.Errorf("width=%d: prompt row is %d cols wide (would wrap)", width, w)
-		}
-		for _, l := range strings.Split(m.vp.View(), "\n") {
-			if lipgloss.Width(l) > m.vp.Width {
-				t.Errorf("width=%d: transcript line exceeds viewport width %d: %q", width, m.vp.Width, l)
+			for i, l := range strings.Split(m.View(), "\n") {
+				if w := lipgloss.Width(l); w >= width {
+					t.Errorf("width=%d helmet=%v: line %d reaches the last column (%d>=%d): %q",
+						width, helmet, i, w, width, l)
+				}
 			}
 		}
 	}
