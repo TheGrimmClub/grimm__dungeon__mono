@@ -96,9 +96,23 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.input.CursorEnd()
 			}
 			return m, nil
+		case tea.KeyPgUp, tea.KeyPgDown:
+			// Explicit scrollback through the transcript.
+			var cmd tea.Cmd
+			m.vp, cmd = m.vp.Update(msg)
+			return m, cmd
+		default:
+			// Typed characters go ONLY to the input. They must never reach the
+			// viewport, whose default keymap treats letters like k/j/u/d/f/b and
+			// space as scroll commands — which would shift the transcript while
+			// you type a keyword (e.g. the "k" in "look"/"take"/"speak").
+			var cmd tea.Cmd
+			m.input, cmd = m.input.Update(msg)
+			return m, cmd
 		}
 	}
 
+	// Non-key messages (cursor blink, etc.): update the input and the viewport.
 	var cmds []tea.Cmd
 	var cmd tea.Cmd
 	m.input, cmd = m.input.Update(msg)

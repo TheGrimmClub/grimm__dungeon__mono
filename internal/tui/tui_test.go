@@ -132,6 +132,50 @@ func TestNoLineReachesLastColumn(t *testing.T) {
 	}
 }
 
+// tallModel builds a model whose transcript overflows a short terminal, so the
+// viewport is genuinely scrollable.
+func tallModel(t *testing.T) model {
+	t.Helper()
+	w, err := world.Load(content.FS, content.WorldGlob)
+	if err != nil {
+		t.Fatalf("load world: %v", err)
+	}
+	intro := strings.TrimRight(strings.Repeat("Eine Zeile im Verlies.\n", 40), "\n")
+	return newModel(session.New(engine.New(w), ""), intro)
+}
+
+// TestTypingDoesNotScrollViewport is the real line-deletion repro: typing a
+// keyword that contains a viewport scroll-key letter (k/j/u/d/f/b) must not move
+// the transcript. Previously the keystroke was forwarded to the viewport too.
+func TestTypingDoesNotScrollViewport(t *testing.T) {
+	m := tallModel(t)
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 80, Height: 8})
+
+	before := m.vp.YOffset
+	if before == 0 {
+		t.Fatal("test setup: viewport is not scrolled (nothing to scroll)")
+	}
+	for _, r := range "look" { // the trailing 'k' used to scroll up
+		m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{r}})
+	}
+	if m.vp.YOffset != before {
+		t.Errorf("typing scrolled the viewport: YOffset %d -> %d", before, m.vp.YOffset)
+	}
+	if m.input.Value() != "look" {
+		t.Errorf("typed text should land in the input, got %q", m.input.Value())
+	}
+}
+
+func TestPgUpStillScrolls(t *testing.T) {
+	m := tallModel(t)
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 80, Height: 8})
+	before := m.vp.YOffset
+	m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyPgUp})
+	if m.vp.YOffset >= before {
+		t.Errorf("PgUp should scroll up: YOffset %d -> %d", before, m.vp.YOffset)
+	}
+}
+
 func TestModelSubmitHistoryAndQuit(t *testing.T) {
 	m := testModel(t)
 
