@@ -105,6 +105,45 @@ decisions:
     date: 2026-06-06
     rationale: Cooler and class-neutral at the start; sets up a future class system.
 
+  - id: D017
+    title: Head-up display (HUD) as a helmet feature
+    decision: >
+      The helmet (item flag hud:true) unlocks a right-hand HUD in the Bubble Tea UI: an
+      inventory box over a map (move-options) box, both lipgloss-bordered. Like the
+      headlamp colour, it appears when the helmet is worn; it degrades to the full-width
+      view when the helmet is off or the terminal is narrower than 64 cols. Engine exposes
+      structured state (HUDActive/RoomTitle/ExitsView/InventoryView); the tui renders it.
+    status: accepted
+    date: 2026-06-07
+    rationale: A real game-feel display, and a natural reward for the helmet line (colour -> HUD).
+    requirements: [R008]
+
+  - id: D018
+    title: Read-aloud narration now (TTS); voice input (STT) later
+    decision: >
+      Narrate the German text via the OS voice (macOS say, Linux espeak/spd-say, Windows
+      SAPI) behind a voice.Player interface with a Noop fallback, toggled by /voice and
+      announced by the helmet. macOS German voice via GRIMM_VOICE=Anna. Speech-to-text
+      (voice commands) is deferred to its own later investigation (whisper.cpp or cloud).
+    status: accepted
+    date: 2026-06-07
+    rationale: Read-aloud is offline, dependency-light and matches "read the content"; STT is a big, separate lift.
+    requirements: [R008]
+
+  - id: D019
+    title: Sound effects engine via Go audio (beep/oto) — planned next
+    decision: >
+      Music/SFX will use a Go audio library (gopxl/beep + ebitengine/oto). NOT yet
+      implemented. It pulls native audio bindings (CoreAudio/WASAPI via purego; Linux ALSA
+      needs CGO + libasound2-dev), so it must land behind a build tag with a Noop default
+      so the dependency-free build and CI stay green, plus a dedicated audio-typecheck CI
+      job and updated cross-compile. Cues can be synthesized (beep generators) to avoid
+      sourcing audio assets initially.
+    status: proposed
+    date: 2026-06-07
+    rationale: Honour the chosen approach while protecting the clean single-binary build and CI.
+    requirements: [R008]
+
   - id: D016
     title: Puzzle attempt model — locked doors + `solve`
     decision: >

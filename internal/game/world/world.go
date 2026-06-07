@@ -51,6 +51,7 @@ type Item struct {
 	Takeable    bool   `yaml:"takeable"`
 	Wearable    bool   `yaml:"wearable"` // can be worn with `wear`
 	Light       bool   `yaml:"light"`    // when worn, lights the dungeon (color on)
+	Hud         bool   `yaml:"hud"`      // when worn, enables the head-up display
 }
 
 // World is the assembled dungeon graph.

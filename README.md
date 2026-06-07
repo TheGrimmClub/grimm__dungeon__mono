@@ -16,8 +16,10 @@ and `/alchemist` — version control reimagined as potion brewing).
 in German. Wearing the headlamp floods the terminal with colour; doors are gated
 by puzzles — a riddle (`answer`) and a "choose your path" `behavioral` check
 (Python/Go/CLI), backed by `internal/puzzle` + `internal/runner`. Pick a class
-with `/class`. Save/`/save`, history, hidden `import antigravity`. Roadmap: the
-approved plan and [`docs/design`](docs/design).
+with `/class`. Wearing the helmet also raises a **HUD** (inventory + map on the
+right) and a **voice** that reads the German aloud (`/voice`; set
+`GRIMM_VOICE=Anna` on macOS for a German voice). Save/`/save`, history, hidden
+`import antigravity`. Roadmap: the approved plan and [`docs/design`](docs/design).
 
 ## Quick start
 

@@ -12,6 +12,7 @@ import (
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/voice"
 )
 
 // Result is the outcome of submitting one line.
@@ -25,13 +26,28 @@ type Session struct {
 	game     *engine.Game
 	reg      *command.Registry
 	savePath string // "" disables /save
+
+	player  voice.Player // text-to-speech backend (Noop by default)
+	voiceOn bool         // whether narration is currently enabled
 }
 
 // New builds a session around a game. savePath may be "" to disable saving.
 func New(game *engine.Game, savePath string) *Session {
-	s := &Session{game: game, reg: command.NewRegistry(), savePath: savePath}
+	s := &Session{
+		game:     game,
+		reg:      command.NewRegistry(),
+		savePath: savePath,
+		player:   voice.Noop(),
+	}
 	s.registerBuiltins()
 	return s
+}
+
+// SetVoice installs a text-to-speech backend (the app injects the OS voice).
+func (s *Session) SetVoice(p voice.Player) {
+	if p != nil {
+		s.player = p
+	}
 }
 
 // Game exposes the underlying engine (the TUI reads Title/Lit from it).
@@ -48,7 +64,16 @@ func (s *Session) Submit(line string) Result {
 	case normalize(line) == "import antigravity":
 		return Result{Output: i18n.T(i18n.KeyEasterEgg) + antigravityArt}
 	default:
-		return Result{Output: s.game.Do(line)}
+		out := s.game.Do(line)
+		s.narrate(out) // read the room/answer aloud when voice is on
+		return Result{Output: out}
+	}
+}
+
+// narrate speaks engine output aloud when narration is enabled and available.
+func (s *Session) narrate(text string) {
+	if s.voiceOn && s.player.Available() {
+		s.player.Speak(text)
 	}
 }
 

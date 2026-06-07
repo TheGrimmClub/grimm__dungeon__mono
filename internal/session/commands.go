@@ -3,6 +3,7 @@ package session
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
@@ -63,6 +64,15 @@ func (s *Session) registerBuiltins() {
 	})
 
 	s.reg.Register(&command.Command{
+		Name:    "voice",
+		Summary: i18n.T(i18n.KeyCmdVoice),
+		Run: func(ctx *command.Context, args []string) error {
+			s.toggleVoice(ctx.Out, args)
+			return nil
+		},
+	})
+
+	s.reg.Register(&command.Command{
 		Name:    "quit",
 		Summary: i18n.T(i18n.KeyCmdQuit),
 		Run: func(ctx *command.Context, _ []string) error {
@@ -80,6 +90,30 @@ func (s *Session) registerBuiltins() {
 			return nil
 		},
 	})
+}
+
+// toggleVoice turns narration on/off ("/voice", "/voice on", "/voice off").
+func (s *Session) toggleVoice(out io.Writer, args []string) {
+	want := !s.voiceOn // bare /voice toggles
+	if len(args) > 0 {
+		switch strings.ToLower(args[0]) {
+		case "on", "an", "ein":
+			want = true
+		case "off", "aus":
+			want = false
+		}
+	}
+	if want && !s.player.Available() {
+		fmt.Fprintln(out, i18n.T(i18n.KeyVoiceUnavailable))
+		return
+	}
+	s.voiceOn = want
+	if s.voiceOn {
+		fmt.Fprintln(out, i18n.T(i18n.KeyVoiceOn))
+	} else {
+		s.player.Stop()
+		fmt.Fprintln(out, i18n.T(i18n.KeyVoiceOff))
+	}
 }
 
 // chooseClass lists the paths, or sets one if the player named it.

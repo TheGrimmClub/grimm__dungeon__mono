@@ -41,6 +41,35 @@ func TestModelSurvivesInputBeforeAndZeroSize(t *testing.T) {
 	_ = m.View() // must not panic
 }
 
+func TestHUDAppearsWithHelmet(t *testing.T) {
+	m := testModel(t)
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 100, Height: 30})
+	if strings.Contains(m.View(), "INVENTAR") {
+		t.Error("HUD should be hidden before the helmet is worn")
+	}
+
+	m.input.SetValue("wear 1") // take + wear the helmet (hud:true)
+	m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+
+	v := m.View()
+	if !strings.Contains(v, "INVENTAR") || !strings.Contains(v, "KARTE") {
+		t.Errorf("HUD boxes should appear once the helmet is worn:\n%s", v)
+	}
+	if !strings.Contains(v, "Helm mit Stirnlampe") {
+		t.Errorf("inventory box should list the helmet:\n%s", v)
+	}
+}
+
+func TestHUDHiddenOnNarrowTerminal(t *testing.T) {
+	m := testModel(t)
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 40, Height: 30})
+	m.input.SetValue("wear 1")
+	m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+	if strings.Contains(m.View(), "INVENTAR") {
+		t.Error("HUD should stay hidden on a narrow terminal even with the helmet")
+	}
+}
+
 func TestModelSubmitHistoryAndQuit(t *testing.T) {
 	m := testModel(t)
 

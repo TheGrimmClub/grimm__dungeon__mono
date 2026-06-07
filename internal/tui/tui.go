@@ -1,7 +1,7 @@
 // Package tui is grimm's Bubble Tea view/input layer: a scrollback viewport, a
-// text input with up/down history, and a prompt that lights up in colour once
-// the player wears the headlamp. All game logic lives in package session, which
-// this layer merely drives.
+// text input with up/down history, a prompt that lights up once the headlamp is
+// worn, and a right-hand HUD (inventory + map) that appears with the helmet.
+// All game logic lives in package session, which this layer merely drives.
 package tui
 
 import (
@@ -29,6 +29,8 @@ type model struct {
 	vp         viewport.Model
 	hist       history
 	transcript []string
+	width      int
+	height     int
 	ready      bool
 }
 
@@ -49,14 +51,12 @@ func (m model) Init() tea.Cmd { return textinput.Blink }
 func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.WindowSizeMsg:
-		w, h := clampSize(msg.Width, msg.Height)
+		m.width, m.height = msg.Width, msg.Height
 		if !m.ready {
-			m.vp = viewport.New(w, h)
+			m.vp = viewport.New(1, 1)
 			m.ready = true
-		} else {
-			m.vp.Width, m.vp.Height = w, h
 		}
-		m.refresh()
+		m.relayout()
 		return m, nil
 
 	case tea.KeyMsg:
@@ -90,19 +90,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 // submit handles Enter: echo the line, run it through the session, append the
-// output, record history, and quit if asked.
+// output, record history, re-layout (the HUD may have just toggled), and quit
+// if asked.
 func (m model) submit() (tea.Model, tea.Cmd) {
 	line := strings.TrimSpace(m.input.Value())
 	m.input.Reset()
 
-	// Echo what was typed (the input box is now cleared).
 	m.transcript = append(m.transcript, m.promptLabel()+line)
 	res := m.sess.Submit(line)
 	if res.Output != "" {
 		m.transcript = append(m.transcript, res.Output)
 	}
 	m.hist.add(line)
-	m.refresh()
+	m.relayout()
 	if res.Quit {
 		return m, tea.Quit
 	}
@@ -113,12 +113,44 @@ func (m model) View() string {
 	if !m.ready {
 		return "\n  initialisiere das Verlies…"
 	}
-	return m.vp.View() + "\n" + m.promptLabel() + m.input.View()
+	_, vpHeight, showHUD := m.geometry()
+	main := m.vp.View()
+	if showHUD {
+		main = lipgloss.JoinHorizontal(lipgloss.Top, main, " ", renderHUD(m.sess.Game(), vpHeight))
+	}
+	return main + "\n" + m.promptLabel() + m.input.View()
+}
+
+// geometry computes the viewport size and whether the HUD is shown, given the
+// current terminal size and whether the helmet is on.
+func (m model) geometry() (vpWidth, vpHeight int, showHUD bool) {
+	vpHeight = m.height - 2 // reserve a line for the prompt + spacing
+	if vpHeight < 1 {
+		vpHeight = 1
+	}
+	vpWidth = m.width
+	showHUD = m.sess.Game().HUDActive() && m.width >= minWidthForHUD
+	if showHUD {
+		vpWidth = m.width - sidebarWidth - 1 // sidebar + a spacer column
+	}
+	if vpWidth < 1 {
+		vpWidth = 1
+	}
+	return vpWidth, vpHeight, showHUD
+}
+
+// relayout resizes the viewport for the current geometry and refreshes content.
+func (m *model) relayout() {
+	if !m.ready {
+		return
+	}
+	w, h, _ := m.geometry()
+	m.vp.Width, m.vp.Height = w, h
+	m.refresh()
 }
 
 // refresh rebuilds the viewport content from the transcript and re-styles the
-// prompt for the current light state, then scrolls to the bottom. It is safe to
-// call before the first WindowSizeMsg (the viewport simply isn't drawn yet).
+// prompt for the current light state, then scrolls to the bottom.
 func (m *model) refresh() {
 	m.input.PromptStyle = m.promptStyle()
 	if !m.ready || m.vp.Height < 1 {
@@ -126,18 +158,6 @@ func (m *model) refresh() {
 	}
 	m.vp.SetContent(strings.Join(m.transcript, "\n\n"))
 	m.vp.GotoBottom()
-}
-
-// clampSize keeps the viewport dimensions positive (a pty can report 0x0).
-func clampSize(width, height int) (w, h int) {
-	w, h = width, height-2 // reserve a line for the prompt + spacing
-	if w < 1 {
-		w = 1
-	}
-	if h < 1 {
-		h = 1
-	}
-	return w, h
 }
 
 // promptLabel is the "Human> " prefix, styled for the current light state.

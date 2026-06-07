@@ -8,9 +8,11 @@ description: |
   Ein robuster Helm, an dessen Stirn eine kleine Lampe sitzt. Ihr Glühfaden
   flackert wie ein gefangenes Glühwürmchen. Setz ihn auf (»wear helm«), und das
   Dunkel des Verlieses weicht — plötzlich siehst du die Welt in Farbe.
+  Im Visier erwacht eine Anzeige: Inventar und Karte, stets im Blick.
 takeable: true
 wearable: true
 light: true
+hud: true
 
 ---
 kind: item

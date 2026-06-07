@@ -15,6 +15,7 @@ import (
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/session"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/tui"
+	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/voice"
 )
 
 // Run starts grimm with the default save location (~/.grimm/save.yaml).
@@ -52,6 +53,7 @@ func NewSession(savePath string) (*session.Session, string, error) {
 	}
 
 	sess := session.New(game, savePath)
+	sess.SetVoice(voice.New()) // OS text-to-speech; Noop where unavailable
 	return sess, intro(game, continued), nil
 }
 

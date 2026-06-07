@@ -42,12 +42,18 @@ const (
 	KeyClassChoose  = "class.choose"
 	KeyClassChosen  = "class.chosen"
 	KeyClassUnknown = "class.unknown"
-	KeySaved        = "game.saved"
-	KeySaveFailed   = "game.save_failed"
-	KeySaveDisabled = "game.save_disabled"
-	KeyContinued    = "game.continued"
-	KeyVerbHint     = "game.verb_hint"
-	KeyEmptyInfo    = "game.empty_info"
+
+	// Voice (TTS)
+	KeyCmdVoice         = "cmd.voice"
+	KeyVoiceOn          = "voice.on"
+	KeyVoiceOff         = "voice.off"
+	KeyVoiceUnavailable = "voice.unavailable"
+	KeySaved            = "game.saved"
+	KeySaveFailed       = "game.save_failed"
+	KeySaveDisabled     = "game.save_disabled"
+	KeyContinued        = "game.continued"
+	KeyVerbHint         = "game.verb_hint"
+	KeyEmptyInfo        = "game.empty_info"
 
 	// Help: section headers and one-line descriptions of the game verbs.
 	KeyHelpCmdHeader  = "help.cmd_header"
@@ -129,9 +135,13 @@ func init() {
 		"(worn)")
 	add(KeyHeadlampOn,
 		"Du setzt den Helm auf und drückst auf die Stirnlampe. Ein Klick — und das "+
-			"Dunkel weicht: zum ersten Mal siehst du das Verlies in Farbe.",
+			"Dunkel weicht: zum ersten Mal siehst du das Verlies in Farbe. Im Visier "+
+			"erwacht eine Anzeige (Inventar & Karte), und eine Stimme flüstert: "+
+			"»Tippe /voice, und ich lese dir vor.«",
 		"You put on the helmet and click the headlamp. The dark recoils — for the "+
-			"first time you see the dungeon in colour.")
+			"first time you see the dungeon in colour. A display lights up in your "+
+			"visor (inventory & map), and a voice whispers: \"Type /voice and I'll "+
+			"read to you.\"")
 
 	add(KeySolveHint,
 		"(Antworte mit »solve <deine Lösung>«.)",
@@ -174,6 +184,19 @@ func init() {
 	add(KeyClassUnknown,
 		"»%s« ist kein Pfad, den ich kenne. Tippe »/class« für die Liste.",
 		"\"%s\" is not a path I know. Type \"/class\" for the list.")
+
+	add(KeyCmdVoice,
+		"liest den Text laut vor (an/aus)",
+		"read the text aloud (on/off)")
+	add(KeyVoiceOn,
+		"Die Stimme des Helms erwacht — von nun an liest sie dir vor.",
+		"The helmet's voice awakens — from now on it reads to you.")
+	add(KeyVoiceOff,
+		"Die Stimme des Helms verstummt.",
+		"The helmet's voice falls silent.")
+	add(KeyVoiceUnavailable,
+		"Dieser Rechner hat keine Stimme, die vorlesen könnte.",
+		"This machine has no voice to read aloud.")
 	add(KeySaved,
 		"Dein Fortschritt ist in einem Trank versiegelt.",
 		"Your progress is sealed in a potion.")
