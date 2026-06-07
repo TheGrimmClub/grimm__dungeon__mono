@@ -29,6 +29,8 @@ var gameVerbs = []gameVerb{
 
 // registerBuiltins installs the slash commands.
 func (s *Session) registerBuiltins() {
+	s.registerLaunchers()
+
 	s.reg.Register(&command.Command{
 		Name:    "help",
 		Summary: i18n.T(i18n.KeyCmdHelp),

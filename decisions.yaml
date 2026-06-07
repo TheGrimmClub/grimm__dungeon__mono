@@ -177,14 +177,32 @@ decisions:
     rationale: Simple, discoverable gating; the Check abstraction backs doors, loot and battles.
     requirements: [R003, R005, R013]
 
-  # --- Open / deferred (recorded as proposed; confirm before implementing) ---
   - id: D009
     title: /terminal model
-    decision: Real OS shell scoped to the student's repo workdir (vs a simulated mini-shell).
-    status: proposed
-    date: 2026-06-06
-    rationale: Real git/Python/Go are needed anyway; keeps the "real power" feel. Phase 4.
+    decision: >
+      Real OS shell ($SHELL, falling back to bash/zsh/sh) launched with its working
+      directory set to the student's repo (~/.grimm/work). Implemented in Phase 4: the
+      Bubble Tea UI suspends via tea.ExecProcess, runs the shell, and resumes. "Scoped"
+      means cwd = work dir, not a hard jail — the real-power feel is the point.
+    status: accepted
+    date: 2026-06-07
+    rationale: Real git/Python/Go are needed anyway; authentic over simulated.
     requirements: [R007]
+
+  - id: D021
+    title: /book editor surface
+    decision: >
+      /book <file> opens the student's editor ($VISUAL/$EDITOR, else micro/nano/vim/vi,
+      notepad on Windows) on a file inside the work dir (path traversal stripped), via the
+      same tea.ExecProcess suspend/resume. With /book + /terminal, students can now author
+      files in-game, so behavioral checks accept a real .py/.go file (solve loesung.py) and
+      brew/bottle puzzles become solvable. No integrated editor yet (shell-out first).
+    status: accepted
+    date: 2026-06-07
+    rationale: Shell out to a real editor first; an embedded editor can come later.
+    requirements: [R007]
+
+  # --- Open / deferred (recorded as proposed; confirm before implementing) ---
 
   - id: D010
     title: Communicator contract

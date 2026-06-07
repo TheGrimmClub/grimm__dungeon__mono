@@ -21,6 +21,19 @@ import (
 type Result struct {
 	Output string
 	Quit   bool
+	// Exec, when set, asks the UI to suspend and run an external interactive
+	// process (a shell or editor), then resume. Kept as plain data so the
+	// session stays UI-independent and testable.
+	Exec *ExecRequest
+}
+
+// ExecRequest describes an external process for the UI to run (via Bubble Tea's
+// tea.ExecProcess), e.g. /terminal or /book.
+type ExecRequest struct {
+	Name  string   // binary to run
+	Args  []string // its arguments
+	Dir   string   // working directory
+	After string   // message to show once it returns
 }
 
 // Session owns the game, the slash-command registry and the save location.
@@ -32,7 +45,8 @@ type Session struct {
 	player  voice.Player // text-to-speech backend (Noop by default)
 	voiceOn bool         // whether narration is currently enabled
 
-	alch *alchemist.Alchemist // git-as-potions in the student work dir ("" => unset)
+	alch    *alchemist.Alchemist // git-as-potions in the student work dir
+	workDir string               // student's working directory ("" => unset)
 }
 
 // New builds a session around a game. savePath may be "" to disable saving.
@@ -61,6 +75,7 @@ func (s *Session) SetWorkDir(dir string) {
 		return
 	}
 	_ = os.MkdirAll(dir, 0o755)
+	s.workDir = dir
 	s.alch = alchemist.New(dir)
 }
 
@@ -95,6 +110,16 @@ func (s *Session) narrate(text string) {
 // command's output and translating command.ErrQuit into Result.Quit.
 func (s *Session) runCommand(line string) Result {
 	name, args := parseCommand(line)
+
+	// /terminal and /book return an ExecRequest, so they bypass the
+	// write-to-Out command model.
+	switch name {
+	case "terminal":
+		return s.terminalExec()
+	case "book":
+		return s.bookExec(args)
+	}
+
 	cmd, ok := s.reg.Get(name)
 	if !ok {
 		return Result{Output: i18n.T(i18n.KeyUnknownCommand, "/"+name, "/help")}

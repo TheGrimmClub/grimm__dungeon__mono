@@ -5,6 +5,7 @@
 package tui
 
 import (
+	"os/exec"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/textinput"
@@ -14,6 +15,13 @@ import (
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/session"
 )
+
+// execDoneMsg is delivered after a suspended external process (/terminal,
+// /book) returns control to the TUI.
+type execDoneMsg struct {
+	after string
+	err   error
+}
 
 // Run launches the full-screen Bubble Tea program. intro is the text shown
 // before the first prompt (banner, welcome, the starting room).
@@ -55,6 +63,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if !m.ready {
 			m.vp = viewport.New(1, 1)
 			m.ready = true
+		}
+		m.relayout()
+		return m, nil
+
+	case execDoneMsg:
+		note := msg.after
+		if msg.err != nil {
+			note = "(" + msg.err.Error() + ")"
+		}
+		if note != "" {
+			m.transcript = append(m.transcript, note)
 		}
 		m.relayout()
 		return m, nil
@@ -103,6 +122,16 @@ func (m model) submit() (tea.Model, tea.Cmd) {
 	}
 	m.hist.add(line)
 	m.relayout()
+
+	// /terminal or /book: suspend the TUI, run the real shell/editor, resume.
+	if res.Exec != nil {
+		c := exec.Command(res.Exec.Name, res.Exec.Args...)
+		c.Dir = res.Exec.Dir
+		after := res.Exec.After
+		return m, tea.ExecProcess(c, func(err error) tea.Msg {
+			return execDoneMsg{after: after, err: err}
+		})
+	}
 	if res.Quit {
 		return m, tea.Quit
 	}

@@ -21,8 +21,10 @@ right) and a **voice** that reads the German aloud (`/voice`; set
 `GRIMM_VOICE=Anna` on macOS for a German voice). Version
 your work with **`/alchemist`** (git as potion-brewing: `init`/`brew`/`bottle`/…)
 in `~/.grimm/work` — one door (the Archiv) opens only once you've created your
-own repository. Save/`/save`, history, hidden `import antigravity`. Roadmap: the
-approved plan and [`docs/design`](docs/design).
+own repository. Write code with **`/book <file>`** (your editor) and drop into a
+real shell with **`/terminal`**, then `solve loesung.py` — any language. Save/
+`/save`, history, hidden `import antigravity`. Roadmap: the approved plan and
+[`docs/design`](docs/design).
 
 ## Quick start
 

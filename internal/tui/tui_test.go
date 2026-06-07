@@ -21,6 +21,17 @@ func testModel(t *testing.T) model {
 	return newModel(session.New(engine.New(w), ""), "INTRO")
 }
 
+func testModelWithWorkDir(t *testing.T, dir string) model {
+	t.Helper()
+	w, err := world.Load(content.FS, content.WorldGlob)
+	if err != nil {
+		t.Fatalf("load world: %v", err)
+	}
+	s := session.New(engine.New(w), "")
+	s.SetWorkDir(dir)
+	return newModel(s, "INTRO")
+}
+
 // step applies a message and returns the concrete model back.
 func step(t *testing.T, m model, msg tea.Msg) (model, tea.Cmd) {
 	t.Helper()
@@ -67,6 +78,26 @@ func TestHUDHiddenOnNarrowTerminal(t *testing.T) {
 	m, _ = step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
 	if strings.Contains(m.View(), "INVENTAR") {
 		t.Error("HUD should stay hidden on a narrow terminal even with the helmet")
+	}
+}
+
+func TestTerminalSuspendsTUI(t *testing.T) {
+	m := testModelWithWorkDir(t, t.TempDir())
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 80, Height: 24})
+
+	m.input.SetValue("/terminal")
+	_, cmd := step(t, m, tea.KeyMsg{Type: tea.KeyEnter})
+	if cmd == nil {
+		t.Fatal("/terminal should produce a tea.ExecProcess command")
+	}
+}
+
+func TestExecDoneAppendsNote(t *testing.T) {
+	m := testModel(t)
+	m, _ = step(t, m, tea.WindowSizeMsg{Width: 80, Height: 24})
+	m, _ = step(t, m, execDoneMsg{after: "zurück im Verlies"})
+	if joined := strings.Join(m.transcript, "\n"); !strings.Contains(joined, "zurück im Verlies") {
+		t.Errorf("resume note not appended:\n%s", joined)
 	}
 }
 

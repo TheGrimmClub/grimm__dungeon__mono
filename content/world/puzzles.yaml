@@ -27,7 +27,9 @@ prompt: |
   oder etwa »python3 -c "print(21*2)"«.
 success: |
   Die Ziffern verlöschen, zufrieden. Eine schmale Tür gleitet zur Seite.
-hint: Versuche »solve echo 42« — oder rechne wirklich, wenn du magst.
+hint: |
+  Versuche »solve echo 42« — oder schreibe ein echtes Programm:
+  »/book loesung.py«, dann z. B. print(21*2), und »solve loesung.py«.
 check:
   kind: behavioral
   cases:

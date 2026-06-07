@@ -52,6 +52,16 @@ const (
 	// Alchemist (git)
 	KeyCmdAlchemist   = "cmd.alchemist"
 	KeyAlchemistNoDir = "alchemist.no_dir"
+
+	// Terminal & editor surfaces
+	KeyCmdTerminal    = "cmd.terminal"
+	KeyCmdBook        = "cmd.book"
+	KeyTerminalEnter  = "terminal.enter"
+	KeyTerminalReturn = "terminal.return"
+	KeyBookUsage      = "book.usage"
+	KeyBookOpen       = "book.open"
+	KeyBookClosed     = "book.closed"
+	KeyNoEditor       = "book.no_editor"
 	KeySaved          = "game.saved"
 	KeySaveFailed     = "game.save_failed"
 	KeySaveDisabled   = "game.save_disabled"
@@ -208,6 +218,31 @@ func init() {
 	add(KeyAlchemistNoDir,
 		"Hier gibt es keinen Kessel — es ist kein Arbeitsverzeichnis eingerichtet.",
 		"There is no cauldron here — no working directory is set up.")
+
+	add(KeyCmdTerminal,
+		"öffnet eine echte Shell in deinem Kessel",
+		"open a real shell in your cauldron")
+	add(KeyCmdBook,
+		"öffnet das Buch (Editor): /book <datei>",
+		"open the book (editor): /book <file>")
+	add(KeyTerminalEnter,
+		"Du steigst hinab in die Shell deines Kessels …",
+		"You descend into your cauldron's shell …")
+	add(KeyTerminalReturn,
+		"Du tauchst aus der Shell wieder ins Verlies auf.",
+		"You surface from the shell back into the dungeon.")
+	add(KeyBookUsage,
+		"Welches Buch? Tippe »/book <datei>«, z. B. »/book zauber.py«.",
+		"Which book? Type \"/book <file>\", e.g. \"/book spell.py\".")
+	add(KeyBookOpen,
+		"Du schlägst das Buch »%s« auf …",
+		"You open the book \"%s\" …")
+	add(KeyBookClosed,
+		"Du klappst das Buch zu. Vergiss nicht zu brauen (»/alchemist brew«)!",
+		"You close the book. Don't forget to brew (\"/alchemist brew\")!")
+	add(KeyNoEditor,
+		"Kein Editor gefunden. Setze $EDITOR oder installiere micro/nano.",
+		"No editor found. Set $EDITOR or install micro/nano.")
 	add(KeySaved,
 		"Dein Fortschritt ist in einem Trank versiegelt.",
 		"Your progress is sealed in a potion.")
