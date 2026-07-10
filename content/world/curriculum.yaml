@@ -100,6 +100,26 @@ check:
     - { in: "Gretel", out: "Gretel betritt das Verlies." }
 
 ---
+kind: puzzle
+id: lern-actor
+prompt: |
+  Ein letzter Schrein, und darauf dein eigenes Werk. Die Inschrift verlangt:
+  »Rufe dein Paket. Erschaffe einen Actor mit dem Namen aus der Eingabe und
+   zeige ihn — so, wie er wartet.«
+success: |
+  Der Schrein erkennt dein eigenes Paket wieder. »grimm.Actor« ist nun dein
+  Werkzeug, in Kammer wie in Verlies. Der Lernpfad ist vollendet.
+hint: |
+  In deinem Arbeitsverzeichnis liegt bereits das Paket »grimm« (aus
+  grimm__python__zero). Nutze es: from grimm import Actor — dann
+  print(Actor(name=input())).
+check:
+  kind: behavioral
+  cases:
+    - { in: "Hans", out: "🧍 Hans wartet vor dem Verlies." }
+    - { in: "Gretel", out: "🧍 Gretel wartet vor dem Verlies." }
+
+---
 kind: room
 id: kammer-variablen
 title: Die Kammer der Namen und Werte
@@ -155,7 +175,22 @@ title: Die Kammer der Baupläne
 description: |
   In der Mitte schwebt ein leuchtender Bauplan — die Form eines Helden, bereit,
   mit Leben gefüllt zu werden. Du hast den Lernpfad gemeistert: Werte,
-  Entscheidungen, Schleifen, Rituale und nun Baupläne. Dein »grimm.Actor« ist
-  kein Rätsel mehr, sondern dein Werkzeug. Nach Süden (south) geht es zurück.
+  Entscheidungen, Schleifen, Rituale und nun Baupläne. Nach Süden (south) geht
+  es zurück; nach Norden (north) wartet ein letzter Schrein, der dein eigenes
+  Paket verlangt.
 exits:
   south: { to: kammer-funktionen }
+  north: { to: kammer-actor, puzzle: lern-actor }
+
+---
+kind: room
+id: kammer-actor
+title: Der Schrein des eigenen Werks
+description: |
+  Ein stiller Schrein, in dessen Mitte ein Spiegel steht. Darin erkennst du
+  nicht dein Gesicht, sondern deinen Actor — den du selbst erschaffen hast.
+  Hier schließen sich Lernpfad und Verlies zu einem Kreis: was du im Grimmoire
+  gelernt hast, lebt nun in deinem eigenen Paket »grimm«. Nach Süden (south)
+  geht es zurück.
+exits:
+  south: { to: kammer-klassen }

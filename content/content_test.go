@@ -17,13 +17,13 @@ func TestEmbeddedDungeonLoads(t *testing.T) {
 	if w.Start != "tor" {
 		t.Errorf("start room = %q, want tor", w.Start)
 	}
-	// 7 core rooms + 5 Lernpfad chambers (content/world/curriculum.yaml).
-	if len(w.Rooms) != 12 {
-		t.Errorf("rooms = %d, want 12", len(w.Rooms))
+	// 7 core rooms + 6 Lernpfad chambers (content/world/curriculum.yaml).
+	if len(w.Rooms) != 13 {
+		t.Errorf("rooms = %d, want 13", len(w.Rooms))
 	}
-	// 3 core puzzles + 5 Lernpfad puzzles (content/world/curriculum.yaml).
-	if len(w.Puzzles) != 8 {
-		t.Errorf("puzzles = %d, want 8", len(w.Puzzles))
+	// 3 core puzzles + 6 Lernpfad puzzles (content/world/curriculum.yaml).
+	if len(w.Puzzles) != 9 {
+		t.Errorf("puzzles = %d, want 9", len(w.Puzzles))
 	}
 	// Spot-check the reward loot in the final room.
 	if it := w.Item("kristallkern"); it == nil || !it.Takeable {

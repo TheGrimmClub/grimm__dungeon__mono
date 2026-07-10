@@ -76,6 +76,9 @@ func workDir(savePath string) string {
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return ""
 	}
+	// Seed the `grimm` package so behavioral solutions can `from grimm import
+	// Actor`. Best-effort: a failure here shouldn't stop the student playing.
+	_ = content.SeedWorkspace(dir)
 	return dir
 }
 
