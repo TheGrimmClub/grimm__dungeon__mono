@@ -1,0 +1,161 @@
+# Der Lernpfad — a curriculum wing branching north off the Bibliothek.
+# Each door is gated by a behavioral puzzle that mirrors a Grimmoire chapter:
+#
+#   lern-variablen   -> Grimmoire 04 · Variables & Values
+#   lern-bedingungen -> Grimmoire 06 · Conditions
+#   lern-schleifen   -> Grimmoire 07 · Loops & Controls
+#   lern-funktionen  -> Grimmoire 08 · Functions
+#   lern-klassen     -> Grimmoire 09 · Classes  (concept behind grimm.Actor)
+#
+# Solutions are the student's own: `/book loesung.py`, then `solve loesung.py`.
+# See https://thegrimmclub.github.io/grimmoire/
+
+kind: puzzle
+id: lern-variablen
+prompt: |
+  Eine Schrifttafel erwacht: »Ein Held tritt ein mit 100 Lebenspunkten. Eine
+  Falle raubt ihm 30. Nenne die Zahl, die bleibt.«
+  Merke dir Werte in Variablen — dann rechne.
+success: |
+  Die Tafel erlischt, zufrieden. Ein Durchgang nach Norden öffnet sich.
+hint: |
+  Speichere Werte in Variablen: hp = 100, dann hp = hp - 30, und print(hp).
+  Schreib es mit »/book loesung.py« und »solve loesung.py« — oder direkt
+  »solve python3 -c "print(100 - 30)"«.
+check:
+  kind: behavioral
+  cases:
+    - { in: "", out: "70" }
+
+---
+kind: puzzle
+id: lern-bedingungen
+prompt: |
+  Ein Wächter aus Licht versperrt den Weg: »Ich nenne dir die Lebenspunkte eines
+  Helden über die Eingabe. Lebt er noch — mehr als 0 —, so sprich »lebt«.
+  Ist er gefallen, so sprich »gefallen«.«
+success: |
+  Der Wächter verbeugt sich und tritt beiseite.
+hint: |
+  Lies die Zahl mit hp = int(input()). Dann entscheide:
+  if hp > 0: print("lebt")  —  else: print("gefallen").
+check:
+  kind: behavioral
+  cases:
+    - { in: "30", out: "lebt" }
+    - { in: "0", out: "gefallen" }
+
+---
+kind: puzzle
+id: lern-schleifen
+prompt: |
+  Zehn Fackeln hängen im Dunkeln, doch nur die geraden brennen. Zähle sie laut:
+  die geraden Zahlen von 1 bis 10, jede in einer eigenen Zeile.
+success: |
+  Die geraden Fackeln flammen auf und erleuchten den Gang nach Norden.
+hint: |
+  Wiederhole mit einer Schleife:
+  for n in range(1, 11): if n % 2 == 0: print(n).
+check:
+  kind: behavioral
+  cases:
+    - { in: "", out: "2\n4\n6\n8\n10" }
+
+---
+kind: puzzle
+id: lern-funktionen
+prompt: |
+  Zwei Runen leuchten, zwei Zahlen in einer Zeile. Ein Ritual — eine Funktion —
+  soll ihre Summe sprechen.
+success: |
+  Die Runen verschmelzen zu einer Tür, die sich lautlos öffnet.
+hint: |
+  Lies die Zeile: a, b = input().split(). Gib einer Funktion einen Namen:
+  def add(x, y): return int(x) + int(y). Dann print(add(a, b)).
+check:
+  kind: behavioral
+  cases:
+    - { in: "3 4", out: "7" }
+    - { in: "10 32", out: "42" }
+
+---
+kind: puzzle
+id: lern-klassen
+prompt: |
+  Der letzte Torwächter verlangt einen Helden aus eigener Hand: Erschaffe einen
+  Helden mit einem Namen (aus der Eingabe) und lass ihn eintreten. Er soll
+  sprechen: »<Name> betritt das Verlies.«
+success: |
+  Dein selbstgebauter Held tritt ein — und der Weg ist frei. Genau so lebt auch
+  »grimm.Actor« aus deinem eigenen Paket: ein Bauplan, zum Leben erweckt.
+hint: |
+  Ein Bauplan ist eine Klasse:
+  class Hero:  def __init__(self, name): self.name = name
+               def enter(self): print(f"{self.name} betritt das Verlies.")
+  Lies den Namen mit input(), erschaffe Hero(name) und rufe .enter() auf.
+check:
+  kind: behavioral
+  cases:
+    - { in: "Hans", out: "Hans betritt das Verlies." }
+    - { in: "Gretel", out: "Gretel betritt das Verlies." }
+
+---
+kind: room
+id: kammer-variablen
+title: Die Kammer der Namen und Werte
+description: |
+  Kristalle an den Wänden fassen je einen Wert — eine Zahl, ein Wort, ein
+  Funke Wahrheit. Wer hier steht, hat gelernt, Dinge zu benennen und zu
+  verwandeln. Nach Süden (south) geht es zurück in die Bibliothek; nach Norden
+  (north) wartet ein Wächter aus Licht an einer Weggabelung.
+exits:
+  south: { to: bibliothek }
+  north: { to: kammer-bedingungen, puzzle: lern-bedingungen }
+
+---
+kind: room
+id: kammer-bedingungen
+title: Die Kammer der Weggabelung
+description: |
+  Zwei Pfade, ein Wächter. Hier entscheidet sich alles an einer einzigen Frage:
+  wahr oder falsch. Zurück geht es nach Süden (south); weiter nach Norden
+  (north), wo zehn Fackeln reglos in der Dunkelheit hängen.
+exits:
+  south: { to: kammer-variablen }
+  north: { to: kammer-schleifen, puzzle: lern-schleifen }
+
+---
+kind: room
+id: kammer-schleifen
+title: Die Kammer der wiederkehrenden Fackeln
+description: |
+  Reihen von Fackeln, so weit das Auge reicht — manche entzünden sich wieder
+  und wieder im selben Takt. Wer das Wiederholen beherrscht, kommt hier durch.
+  Nach Süden (south) zurück, nach Norden (north) glühen zwei Runen an einem Altar.
+exits:
+  south: { to: kammer-bedingungen }
+  north: { to: kammer-funktionen, puzzle: lern-funktionen }
+
+---
+kind: room
+id: kammer-funktionen
+title: Die Kammer der Rituale
+description: |
+  An einem Altar liegen Werkzeuge, jedes mit einem Namen, jedes für einen
+  Handgriff. Ein Ritual, einmal benannt, dient dir immer wieder. Nach Süden
+  (south) zurück; nach Norden (north) glüht ein letztes, strenges Tor.
+exits:
+  south: { to: kammer-schleifen }
+  north: { to: kammer-klassen, puzzle: lern-klassen }
+
+---
+kind: room
+id: kammer-klassen
+title: Die Kammer der Baupläne
+description: |
+  In der Mitte schwebt ein leuchtender Bauplan — die Form eines Helden, bereit,
+  mit Leben gefüllt zu werden. Du hast den Lernpfad gemeistert: Werte,
+  Entscheidungen, Schleifen, Rituale und nun Baupläne. Dein »grimm.Actor« ist
+  kein Rätsel mehr, sondern dein Werkzeug. Nach Süden (south) geht es zurück.
+exits:
+  south: { to: kammer-funktionen }

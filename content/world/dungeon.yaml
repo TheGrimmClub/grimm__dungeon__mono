@@ -52,9 +52,12 @@ description: |
   einer alten Maschine, die jede Geschichte zu Ende denkt.
   Nach Westen (west) geht es zurück in die Halle. Im Osten (east) glüht eine
   schmale Tür voller Ziffern — sie scheint eine Rechenaufgabe zu verlangen.
+  Nach Norden (north) führt ein schmaler Bogen in einen Lernpfad: Kammer um
+  Kammer, jede von einer kleinen Programmier-Prüfung verschlossen.
 exits:
   west: { to: halle }
   east: { to: rechenkammer, puzzle: rechen-ritual }
+  north: { to: kammer-variablen, puzzle: lern-variablen }
 items:
   - maerchenbuch
 
