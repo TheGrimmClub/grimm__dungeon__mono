@@ -3,20 +3,30 @@ package world
 import (
 	"errors"
 	"fmt"
-	"io"
 	"io/fs"
 
-	"gopkg.in/yaml.v3"
+	syon "github.com/object-notation-environment/safe-yaml-object-notation/syon-go"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/puzzle"
 )
 
-// Load reads every file matching glob from fsys, parses each as a stream of
-// YAML documents, and assembles them into a World. Each document is routed by
-// its `kind` field: "room", "item" or "meta" (which names the start room).
+// fileDoc is the top-level shape of a content .syon file (decision D013). Any of
+// the sections may be present; files are split by concern (dungeon rooms, items,
+// puzzles, the curriculum wing) but the loader merges them into one World.
+type fileDoc struct {
+	Start   string   `yaml:"start"`
+	Rooms   []Room   `yaml:"rooms"`
+	Items   []Item   `yaml:"items"`
+	Puzzles []Puzzle `yaml:"puzzles"`
+}
+
+// Load reads every file matching glob from fsys, parses each as a single SYON
+// document, and assembles them into a World. SYON is safe YAML — no implicit
+// typing, no tags/anchors/flow (D013) — parsed by the native Go implementation,
+// so the single-binary build (D002) keeps working with no cgo.
 //
-// Decoupling from the embed.FS (it lives in package content) keeps Load
-// testable with an in-memory fs.FS.
+// Decoupling from the embed.FS (it lives in package content) keeps Load testable
+// with an in-memory fs.FS.
 func Load(fsys fs.FS, glob string) (*World, error) {
 	files, err := fs.Glob(fsys, glob)
 	if err != nil {
@@ -43,72 +53,39 @@ func Load(fsys fs.FS, glob string) (*World, error) {
 }
 
 func loadFile(fsys fs.FS, name string, w *World) error {
-	f, err := fsys.Open(name)
+	data, err := fs.ReadFile(fsys, name)
 	if err != nil {
 		return fmt.Errorf("world: open %s: %w", name, err)
 	}
-	defer f.Close()
 
-	dec := yaml.NewDecoder(f)
-	for i := 0; ; i++ {
-		var node yaml.Node
-		if err := dec.Decode(&node); err != nil {
-			if errors.Is(err, io.EOF) {
-				return nil
-			}
-			return fmt.Errorf("world: %s doc %d: %w", name, i, err)
-		}
-		if node.Kind == 0 { // empty document (e.g. trailing "---")
-			continue
-		}
-		if err := routeDoc(&node, name, w); err != nil {
-			return err
-		}
-	}
-}
-
-// routeDoc decodes a single document into the right type based on its kind.
-func routeDoc(node *yaml.Node, name string, w *World) error {
-	var head struct {
-		Kind  string `yaml:"kind"`
-		Start string `yaml:"start"`
-	}
-	if err := node.Decode(&head); err != nil {
-		return fmt.Errorf("world: %s: reading kind: %w", name, err)
+	var doc fileDoc
+	if err := syon.Unmarshal(data, &doc); err != nil {
+		return fmt.Errorf("world: %s: %w", name, err)
 	}
 
-	switch head.Kind {
-	case "room":
-		var r Room
-		if err := node.Decode(&r); err != nil {
-			return fmt.Errorf("world: %s: room: %w", name, err)
-		}
+	if doc.Start != "" {
+		w.Start = doc.Start
+	}
+	for i := range doc.Rooms {
+		r := doc.Rooms[i]
 		if r.ID == "" {
-			return fmt.Errorf("world: %s: room is missing an id", name)
+			return fmt.Errorf("world: %s: a room is missing an id", name)
 		}
 		w.Rooms[r.ID] = &r
-	case "item":
-		var it Item
-		if err := node.Decode(&it); err != nil {
-			return fmt.Errorf("world: %s: item: %w", name, err)
-		}
+	}
+	for i := range doc.Items {
+		it := doc.Items[i]
 		if it.ID == "" {
-			return fmt.Errorf("world: %s: item is missing an id", name)
+			return fmt.Errorf("world: %s: an item is missing an id", name)
 		}
 		w.Items[it.ID] = &it
-	case "puzzle":
-		var p Puzzle
-		if err := node.Decode(&p); err != nil {
-			return fmt.Errorf("world: %s: puzzle: %w", name, err)
-		}
+	}
+	for i := range doc.Puzzles {
+		p := doc.Puzzles[i]
 		if p.ID == "" {
-			return fmt.Errorf("world: %s: puzzle is missing an id", name)
+			return fmt.Errorf("world: %s: a puzzle is missing an id", name)
 		}
 		w.Puzzles[p.ID] = &p
-	case "meta":
-		w.Start = head.Start
-	default:
-		return fmt.Errorf("world: %s: unknown kind %q", name, head.Kind)
 	}
 	return nil
 }
@@ -117,7 +94,7 @@ func routeDoc(node *yaml.Node, name string, w *World) error {
 // and room item points at something real.
 func (w *World) validate() error {
 	if w.Start == "" {
-		return errors.New("world: no start room declared (add a `kind: meta` doc with `start:`)")
+		return errors.New("world: no start room declared (add `start:` to a content file)")
 	}
 	if w.Rooms[w.Start] == nil {
 		return fmt.Errorf("world: start room %q does not exist", w.Start)

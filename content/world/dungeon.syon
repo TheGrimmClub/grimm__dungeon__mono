@@ -1,0 +1,130 @@
+start: tor
+
+rooms:
+  -
+    id: tor
+    title: Das verwunschene Tor
+    description: [[[
+      Ein uraltes Steintor wölbt sich vor dir, von Moos überwuchert. Doch durch die
+      Ritzen pulsiert ein blaues Licht, als flösse Strom durch die Adern des Felsens.
+      Über dem Bogen stehen Worte, halb Gravur, halb Leuchtschrift:
+      »Nur wer liest, wird gehen.«
+      Nach Norden (north) öffnet sich ein dunkler Gang.
+    ]]]
+    exits:
+      north:
+        to: halle
+    items:
+      - helm
+    details:
+      tor: Das Steintor ist uralt, doch unter dem Moos pulsiert Technik. Märchen und Maschine, untrennbar verwoben.
+      worte: Die Leuchtschrift über dem Bogen flackert: »Nur wer liest, wird gehen.« Eine Warnung? Ein Versprechen?
+      licht: Blaues Licht sickert durch die Ritzen im Fels, als pulsiere dahinter ein Herz aus Strom.
+  -
+    id: halle
+    title: Die Halle der schlafenden Maschinen
+    description: [[[
+      Ranken aus Glasfaser umschlingen reglose Androiden, die wie verzauberte
+      Gestalten an den Wänden lehnen. Einer von ihnen blinzelt im Takt eines
+      langsamen Herzschlags — schläft er, oder träumt er von Strom?
+      Gänge führen nach Süden (south) zurück, nach Osten (east) und weiter nach
+      Norden (north). Im Westen (west) sperrt eine vergitterte Tür aus Code den Weg.
+    ]]]
+    exits:
+      south:
+        to: tor
+      east:
+        to: bibliothek
+      north:
+        to: werkstatt
+      west:
+        to: archiv
+        puzzle: repo-tor
+    items:
+      - androide
+  -
+    id: bibliothek
+    title: Die Bibliothek der Märchen-Algorithmen
+    description: [[[
+      Regale bis zur Decke, voll mit Büchern, die leise summen. Manche Seiten sind
+      aus Pergament, andere aus Licht. Wer hier liest, hört zugleich das Rechnen
+      einer alten Maschine, die jede Geschichte zu Ende denkt.
+      Nach Westen (west) geht es zurück in die Halle. Im Osten (east) glüht eine
+      schmale Tür voller Ziffern — sie scheint eine Rechenaufgabe zu verlangen.
+      Nach Norden (north) führt ein schmaler Bogen in einen Lernpfad: Kammer um
+      Kammer, jede von einer kleinen Programmier-Prüfung verschlossen.
+    ]]]
+    exits:
+      west:
+        to: halle
+      east:
+        to: rechenkammer
+        puzzle: rechen-ritual
+      north:
+        to: kammer-variablen
+        puzzle: lern-variablen
+    items:
+      - maerchenbuch
+  -
+    id: werkstatt
+    title: Die Werkstatt des Nanoschmieds
+    description: [[[
+      Funken aus Millionen winziger Roboter wirbeln über einem kalten Amboss. Hier
+      schmiedete einst ein Meister Dinge, die kleiner sind als ein Gedanke. Eine
+      Wendeltreppe führt hinauf (up), der Gang nach Süden (south) zurück in die Halle.
+      Von oben hallt eine Stimme — die Treppe gibt nur preis, wer ihr Rätsel löst.
+    ]]]
+    exits:
+      south:
+        to: halle
+      up:
+        to: turm
+        puzzle: turm-raetsel
+    items:
+      - nanostaub
+      - ritualbuch
+    details:
+      wendeltreppe: Eiserne Stufen winden sich nach oben (up) in Richtung Turm. Sieht stabil aus.
+      amboss: Ein kalter Amboss aus schwarzem Metall. Auf ihm wurde Kleinstes geschmiedet — kleiner als ein Gedanke.
+      roboter: Aus der Nähe erkennst du sie: winzige Maschinen, kaum größer als Staubkörner, die im Funkenwirbel tanzen.
+  -
+    id: turm
+    title: Der Turm der wachen KI
+    description: [[[
+      Ganz oben, wo der Wind durch Serverschränke singt, wacht eine Intelligenz,
+      die niemals schläft. Tausend Lichter atmen im Gleichklang. In der Mitte des
+      Raums schwebt etwas Klares und Helles — und es scheint dich zu erwarten.
+      Die KI flüstert: »Du bist noch namenlos, Human. Wähle deinen Pfad — tippe /class.«
+      Nur die Treppe nach unten (down) führt zurück.
+    ]]]
+    exits:
+      down:
+        to: werkstatt
+    items:
+      - kristallkern
+  -
+    id: rechenkammer
+    title: Die Rechenkammer
+    description: [[[
+      Ein enger Raum, dessen Wände mit leuchtenden Zahlenkolonnen bedeckt sind.
+      Sie zählen, addieren, verdoppeln — endlos, als rechne der Fels selbst.
+      Nach Westen (west) geht es zurück in die Bibliothek.
+    ]]]
+    exits:
+      west:
+        to: bibliothek
+    items:
+      - runenchip
+  -
+    id: archiv
+    title: Das Archiv der Versionen
+    description: [[[
+      Endlose Regale voller Schnappschüsse — jeder Augenblick des Verlieses, für
+      immer festgehalten. Hier vergisst nichts und niemand; jede Fassung bleibt
+      abrufbar. Nach Osten (east) geht es zurück in die Halle.
+    ]]]
+    exits:
+      east:
+        to: halle
+    items:
+      - zeitsiegel

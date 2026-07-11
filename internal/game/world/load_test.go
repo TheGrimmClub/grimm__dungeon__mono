@@ -6,35 +6,38 @@ import (
 )
 
 const sampleDoc = `
-kind: meta
 start: tor
----
-kind: room
-id: tor
-title: Das Tor
-description: Ein rostiges Tor.
-exits:
-  north: { to: halle }
-items: [schluessel]
----
-kind: room
-id: halle
-title: Die Halle
-description: Eine weite Halle.
-exits:
-  south: { to: tor }
----
-kind: item
-id: schluessel
-name: Schlüssel
-description: Ein alter Schlüssel.
-takeable: true
+
+rooms:
+  -
+    id: tor
+    title: Das Tor
+    description: Ein rostiges Tor.
+    exits:
+      north:
+        to: halle
+    items:
+      - schluessel
+  -
+    id: halle
+    title: Die Halle
+    description: Eine weite Halle.
+    exits:
+      south:
+        to: tor
+
+items:
+  -
+    id: schluessel
+    name: Schlüssel
+    description: Ein alter Schlüssel.
+    takeable: true
 `
 
 func loadSample(t *testing.T) *World {
 	t.Helper()
-	fsys := fstest.MapFS{"world/dungeon.yaml": {Data: []byte(sampleDoc)}}
-	w, err := Load(fsys, "world/*.yaml")
+	fsys := fstest.MapFS{"world/dungeon.syon": {Data: []byte(sampleDoc)}}
+	w, err := Load(fsys, "world/*.syon")
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}

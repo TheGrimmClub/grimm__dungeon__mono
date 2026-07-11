@@ -19,7 +19,6 @@ type Exit struct {
 // Puzzle is an authored challenge: a German prompt, an acceptance check
 // (puzzle.Spec), and the text shown on success plus an optional hint.
 type Puzzle struct {
-	Kind    string      `yaml:"kind"`
 	ID      string      `yaml:"id"`
 	Prompt  string      `yaml:"prompt"`
 	Success string      `yaml:"success"`
@@ -31,7 +30,6 @@ type Puzzle struct {
 // direction (norden/sueden/osten/westen/oben/unten). Items lists item IDs
 // present in the room at game start.
 type Room struct {
-	Kind        string          `yaml:"kind"`
 	ID          string          `yaml:"id"`
 	Title       string          `yaml:"title"`
 	Description string          `yaml:"description"`
@@ -44,7 +42,6 @@ type Room struct {
 
 // Item is a thing the player can examine and possibly carry, wear or use.
 type Item struct {
-	Kind        string `yaml:"kind"`
 	ID          string `yaml:"id"`
 	Name        string `yaml:"name"`
 	Description string `yaml:"description"`
