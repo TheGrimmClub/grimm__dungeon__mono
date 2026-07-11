@@ -35,7 +35,7 @@ the [install docs](https://taskfile.dev/installation/)). Run `task` to list them
 task run          # build & run grimm
 task check        # go vet + tests
 task ci           # full gate: fmt check + vet + test + build
-task build        # binaries into ./bin (grimm, alchemist)
+task build        # binary into ./bin (grimm)
 ```
 
 Inside grimm: type `/help` for the scroll of commands, `/quit` to leave. Whisper
@@ -49,12 +49,12 @@ the old Python words to the dungeon for a surprise.
 
 | Path | What |
 |------|------|
-| `cmd/grimm`, `cmd/alchemist` | thin binary entry points |
+| `cmd/grimm` | thin binary entry point |
 | `internal/tui` | Bubble Tea UI: scrollback, history, headlamp colour |
 | `internal/session`, `internal/command` | pure dispatch (`/commands` + game verbs) |
 | `internal/game/{world,entity,engine,state}` | the dungeon + verb engine |
 | `internal/i18n` | German narrative text (commands/verbs stay English) |
-| `internal/alchemist` | git-as-potion-brewing library (real wiring: Phase 3) |
+| (external) `grimm__toolbox__mono/tools/alchemist` | git-as-potion-brewing library + standalone CLI (imported via go.mod replace) |
 | `content/` | multi-document YAML rooms/puzzles (Phase 1+) |
 | `requirements.yaml`, `decisions.yaml` | living source of truth |
 

@@ -8,11 +8,11 @@ import (
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
 
-	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/state"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
+	"github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist"
 )
 
 // gameVerb is one row in the "game verbs" section of /help.

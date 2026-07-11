@@ -3,11 +3,16 @@ module github.com/TheGrimmClub/grimm__dungeon__mono
 go 1.24.2
 
 require (
+	github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist v0.0.0
 	github.com/charmbracelet/bubbles v1.0.0
 	github.com/charmbracelet/bubbletea v1.3.10
 	github.com/charmbracelet/lipgloss v1.1.0
 	gopkg.in/yaml.v3 v3.0.1
 )
+
+// alchemist lives in the toolbox monorepo (D006 revised 2026-07-04); resolved
+// locally from the sibling checkout.
+replace github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist => ../grimm__toolbox__mono/tools/alchemist
 
 require (
 	github.com/atotto/clipboard v0.1.4 // indirect

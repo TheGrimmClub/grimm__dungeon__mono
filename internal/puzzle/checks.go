@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/runner"
+	"github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist/runner"
 )
 
 // --- artifact: proof of a real-world action ---

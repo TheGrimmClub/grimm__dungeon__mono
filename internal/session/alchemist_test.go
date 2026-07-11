@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
+	"github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist"
 )
 
 func TestAlchemistNoWorkDir(t *testing.T) {

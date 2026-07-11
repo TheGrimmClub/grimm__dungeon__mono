@@ -18,21 +18,18 @@ tasks:
     silent: true
 
   build:
-    desc: Build grimm and alchemist into ./bin
+    desc: Build grimm into ./bin
     cmds:
       - mkdir -p {{.BIN}}
       - go build -o {{.BIN}}/grimm ./cmd/grimm
-      - go build -o {{.BIN}}/alchemist ./cmd/alchemist
 
   run:
     desc: "Build and run grimm (usage: task run -- <args>)"
     cmds:
       - go run ./cmd/grimm {{.CLI_ARGS}}
 
-  alchemist:
-    desc: "Run the standalone alchemist tool (usage: task alchemist -- <args>)"
-    cmds:
-      - go run ./cmd/alchemist {{.CLI_ARGS}}
+  # The standalone alchemist tool moved to
+  # grimm__toolbox__mono/tools/alchemist (D006 revised 2026-07-04).
 
   test:
     desc: Run the test suite

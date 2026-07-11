@@ -2,7 +2,7 @@
 # Referenced and updated as the project evolves. IDs are stable.
 # status: proposed | accepted | superseded
 meta:
-  updated: 2026-06-06
+  updated: 2026-07-04
 
 decisions:
   - id: D001
@@ -57,6 +57,11 @@ decisions:
       checks. NOTE: the user's original alchemist was a Python prototype (uv/pytest); this
       Go reimplementation supersedes it for the monorepo. The Python tool can be retired
       or kept as a separate standalone — open, low-stakes.
+      REVISED 2026-07-04: alchemist (library + runner + cmd) extracted into
+      grimm__toolbox__mono/tools/alchemist as its own Go module — the toolbox is its
+      single home. grimm imports it via go.mod replace (../grimm__toolbox__mono/tools/
+      alchemist) for the in-game /alchemist; grimm remains a single binary. The Python
+      prototype was retired (archived in Z_Archive/2026/2026-07-04_beriah_premerge).
     status: accepted
     date: 2026-06-07
     rationale: One codebase, single binary, both the standalone tool and the in-game surface.
@@ -232,3 +237,34 @@ decisions:
     rationale: One real, cross-platform automation tool serves both project hygiene and curriculum.
     requirements: [R013]
     supersedes: makefile-from-phase-0
+
+  - id: D013
+    title: Configuration format — move from YAML to SYON
+    decision: >
+      Move authored content and the save format from YAML to SYON (Safe YAML Object
+      Notation). A native Go parser (github.com/object-notation-environment/syon-go)
+      replaces gopkg.in/yaml.v3 for content/save loading — no cgo, so the single-binary
+      story (D002) is preserved.
+    status: proposed
+    date: 2026-07-11
+    rationale: >
+      Moved to a SYON parser because it is safe YAML — no implicit typing, no
+      tags/anchors/flow style — and easier to learn. It lets us teach configuration
+      concepts (keys, lists, nesting) without YAML's drawbacks (the yes/no→bool trap,
+      octal leading zeros, footgun coercions).
+    requirements: [R004]
+
+  - id: D014
+    title: Implementation language — Go over Rust
+    decision: >
+      The dungeon is written in Go rather than Rust.
+    status: accepted
+    date: 2026-07-11
+    rationale: >
+      Go over Rust mainly because of the library Bubble Tea (Charm) — the input/render
+      layer (D008) is best-in-class for this narrative shell and Go-only, with first-class
+      suspend/resume (tea.ExecProcess) for /terminal, /book and solve (D009). Single static
+      binary via embed.FS (D002). Python integration is less strong than Rust's (no
+      PyOxidizer/PyO3-style embedding), but good enough: student code runs via subprocess
+      (D003/D009) and Python is installed as "Quest 0" (D002).
+    requirements: [R010]

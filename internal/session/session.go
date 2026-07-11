@@ -11,11 +11,11 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/alchemist"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/command"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/i18n"
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/voice"
+	"github.com/TheGrimmClub/grimm__toolbox__mono/tools/alchemist"
 )
 
 // Result is the outcome of submitting one line.
