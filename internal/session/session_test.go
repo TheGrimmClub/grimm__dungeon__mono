@@ -75,7 +75,7 @@ func TestFreeTextRoutesToEngine(t *testing.T) {
 }
 
 func TestSaveWritesFile(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "save.yaml")
+	path := filepath.Join(t.TempDir(), "save.syon")
 	s := newSession(t, path)
 	s.Submit("go north")
 	if out := s.Submit("/save").Output; !strings.Contains(out, "versiegelt") {

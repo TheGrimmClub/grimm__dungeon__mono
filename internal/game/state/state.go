@@ -1,6 +1,6 @@
-// Package state persists a player's progress to disk as YAML. Game progress is
-// deliberately kept separate from the student's own work, which lives in their
-// git repo via alchemist (decision D005/D011).
+// Package state persists a player's progress to disk as SYON (D013). Game
+// progress is deliberately kept separate from the student's own work, which
+// lives in their git repo via alchemist (decision D005/D011).
 package state
 
 import (
@@ -10,7 +10,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"gopkg.in/yaml.v3"
+	syon "github.com/object-notation-environment/safe-yaml-object-notation/syon-go"
 
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/game/engine"
 )
@@ -24,13 +24,13 @@ type file struct {
 	Game    engine.Snapshot `yaml:"game"`
 }
 
-// DefaultPath is where grimm keeps its save: ~/.grimm/save.yaml.
+// DefaultPath is where grimm keeps its save: ~/.grimm/save.syon.
 func DefaultPath() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", fmt.Errorf("state: locating home dir: %w", err)
 	}
-	return filepath.Join(home, ".grimm", "save.yaml"), nil
+	return filepath.Join(home, ".grimm", "save.syon"), nil
 }
 
 // Exists reports whether a save file is present at path.
@@ -44,7 +44,7 @@ func Save(path string, snap engine.Snapshot) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return fmt.Errorf("state: creating save dir: %w", err)
 	}
-	data, err := yaml.Marshal(file{Version: saveVersion, Game: snap})
+	data, err := syon.Marshal(file{Version: saveVersion, Game: snap})
 	if err != nil {
 		return fmt.Errorf("state: marshaling save: %w", err)
 	}
@@ -65,7 +65,7 @@ func Load(path string) (engine.Snapshot, error) {
 		return engine.Snapshot{}, fmt.Errorf("state: reading save: %w", err)
 	}
 	var f file
-	if err := yaml.Unmarshal(data, &f); err != nil {
+	if err := syon.Unmarshal(data, &f); err != nil {
 		return engine.Snapshot{}, fmt.Errorf("state: parsing save: %w", err)
 	}
 	return f.Game, nil

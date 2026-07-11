@@ -11,7 +11,7 @@ import (
 )
 
 func TestSaveLoadRoundTrip(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "nested", "save.yaml")
+	path := filepath.Join(t.TempDir(), "nested", "save.syon")
 
 	want := engine.Snapshot{
 		Title:     "Human",
@@ -38,7 +38,7 @@ func TestSaveLoadRoundTrip(t *testing.T) {
 }
 
 func TestLoadMissingReturnsNotExist(t *testing.T) {
-	_, err := Load(filepath.Join(t.TempDir(), "absent.yaml"))
+	_, err := Load(filepath.Join(t.TempDir(), "absent.syon"))
 	if !errors.Is(err, fs.ErrNotExist) {
 		t.Errorf("Load(missing) err = %v, want fs.ErrNotExist", err)
 	}

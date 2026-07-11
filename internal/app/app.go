@@ -20,7 +20,7 @@ import (
 	"github.com/TheGrimmClub/grimm__dungeon__mono/internal/voice"
 )
 
-// Run starts grimm with the default save location (~/.grimm/save.yaml).
+// Run starts grimm with the default save location (~/.grimm/save.syon).
 func Run() error {
 	path, _ := state.DefaultPath() // empty on error -> persistence disabled
 	return RunWith(path)

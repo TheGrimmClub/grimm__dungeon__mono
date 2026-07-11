@@ -25,7 +25,7 @@ func TestNewSessionIntro(t *testing.T) {
 }
 
 func TestSaveThenContinue(t *testing.T) {
-	path := filepath.Join(t.TempDir(), "save.yaml")
+	path := filepath.Join(t.TempDir(), "save.syon")
 
 	// First session: move north and save.
 	s1, _, err := NewSession(path)
