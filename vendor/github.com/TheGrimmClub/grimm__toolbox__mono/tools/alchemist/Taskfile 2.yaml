@@ -1,0 +1,115 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+# Taskfile.yaml — build tasks for Alchemist itself
+# Docs: https://taskfile.dev/docs/reference/schema
+version: "3"
+silent: false
+
+vars:
+  BINARY: alchemist
+  VERSION: 2026.1.0
+  PROJECT_NAME: Grimm/Alchemist
+  SOURCE_DIR: source
+
+tasks:
+  default:
+    cmds:
+      - echo "{{.PROJECT_NAME}} {{.VERSION}}"
+      - task --list
+    silent: true
+
+  init:
+    desc: all initializations and setup tasks
+    cmds:
+      - echo 'export PATH="$PATH:$(go env GOPATH)/bin"' >> ~/.zshrc
+      - echo 'restart the shell or run source ~/.zshrc'
+
+  tidy:
+    desc: Resolve and download dependencies
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "go.mod"
+        msg: did not find `go.mod` in ./{{.SOURCE_DIR}}
+      - sh: exists file "{{.ROOT_DIR}}/pyproject.toml"
+        msg: did not find `pyproject.toml` in {{.ROOT_DIR}}
+    cmds:
+      - echo "Initializing the project..."
+      - go mod tidy
+      - uv sync
+
+  build:
+    desc: Build the binary into ./bin
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "main.go"
+        msg: did not find `main.go` in ./{{.SOURCE_DIR}}
+    cmds:
+      - echo "Building the project..."
+      - go build -o bin/{{.BINARY}} .
+
+  install:
+    desc: Install the binary onto your PATH (go bin dir)
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "main.go"
+        msg: did not find `main.go` in ./{{.SOURCE_DIR}}
+    cmds:
+      - echo "Installing the project..."
+      - go install .
+
+  run:
+    desc: "Run without building — usage: task run -- start"
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "main.go"
+        msg: did not find `main.go` in ./{{.SOURCE_DIR}}
+    cmds:
+      - go run . {{.CLI_ARGS}}
+
+  fmt:
+    desc: Format the code
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "main.go"
+        msg: did not find `main.go` in ./{{.SOURCE_DIR}}
+    cmds:
+      - gofmt -w .
+
+  vet:
+    desc: Run go vet
+    dir: ./{{.SOURCE_DIR}}
+    preconditions:
+      - sh: exists file "main.go"
+        msg: did not find `main.go` in ./{{.SOURCE_DIR}}
+    cmds:
+      - go vet ./...
+
+  check:
+    desc: Format, vet, and build
+    cmds:
+      - task: fmt
+      - task: vet
+      - task: build
+
+  test:
+    desc: Run all tests (behave + pytest)
+    dir: .
+    preconditions:
+      - sh: exists directory "./tests/features"
+        msg: did not find tests/features directory
+    cmds:
+      - echo "Running behave..."
+      - uv run behave --no-capture
+      - echo "Running pytest..."
+      - uv run pytest
+
+  test:pytest:
+    desc: Run only the pytest suite (scaphoid unit tests)
+    dir: .
+    cmds:
+      - uv run pytest
+
+  test:behave:
+    desc: Run only the behave suite (CLI integration tests)
+    dir: .
+    cmds:
+      - uv run behave --no-capture

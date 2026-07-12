@@ -1,0 +1,14 @@
+```syon
+licenses:
+    Creators licenses
+        file: creators.license.sycon
+        version: 1.0
+        tags:
+          - #prefered
+          - #company
+    AGPL:
+        file: AGPL.license.sycon
+        version: 3.0
+        tags:
+          - #open
+          = #copyleft

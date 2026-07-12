@@ -1,0 +1,26 @@
+# Taskfile — alchemist (git as potion-brewing, Go)
+# https://taskfile.dev
+version: '3'
+
+tasks:
+  build:
+    desc: Build the alchemist binary into ./bin
+    cmds:
+      - mkdir -p bin
+      - go build -o bin/alchemist ./cmd/alchemist
+
+  test:
+    desc: Run all tests
+    cmds:
+      - go test ./...
+
+  run:
+    desc: "Run alchemist (usage: task run -- <args>)"
+    cmds:
+      - go run ./cmd/alchemist {{.CLI_ARGS}}
+
+  check:
+    desc: vet + test
+    cmds:
+      - go vet ./...
+      - go test ./...
